@@ -5,8 +5,6 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 
 router.post('/register', authController.register);
-// Thêm 3 dòng này vào để test thử bằng phương thức GET
-router.get('/test', (req, res) => {
-    res.send("🎉 CHÚC MỪNG! THUNDER CLIENT ĐÃ TÌM THẤY ĐƯỜNG VÀO ROUTER!");
-});
+router.post('/login', authController.login);
+
 module.exports = router;

@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 
 const register = async (req, res) => {
@@ -47,4 +48,46 @@ const register = async (req, res) => {
     }
 };
 
-module.exports = { register }; 
+const login = async (req, res) =>{
+    console.log("👉 Đã gọi vào API Login với email:", req.body.email);
+    try{
+        const {email,password} =req.body;
+        if(!email || !password){
+            return res.status(400).json({message:'Nhập đủ email và mật khẩu nhé!'});
+        }
+
+        //tim nguoi dung bang email trong dâtbase
+        const [users]=await db.query('SELECT *FROM users WHERE email=?', [email]);
+        if(users.length===0){
+            return res.status(401).json({message:'Email không tồn tại!'});
+        }
+        const user = users[0];
+
+        //so sánh mật khẩu
+        const isMatch = await bcrypt.compare(password, user.password);
+        if(!isMatch){
+            return res.status(401).json({message:'Mật khẩu không chính xác!'});
+        }
+
+        //tạo JWT token
+        const token = jwt.sign(
+            {id:user.id, role:user.role},
+            process.env.JWT_SECRET,
+            {expiresIn:'1d'} // hsd 1 ngay
+        );
+
+        res.status(200).json({
+            message:'Đăng nhập thành công!',
+            token,
+            user:{
+                id:user.id,
+                full_name:user.full_name,
+                role:user.role
+            }
+        })
+    }catch(error){
+        console.error('❌ Lỗi khi đăng nhập:', error);
+        res.status(500).json({ message: 'Lỗi server, vui lòng thử lại sau.' });
+    }
+}
+module.exports = { register, login }; 
