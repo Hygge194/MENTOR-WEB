@@ -1,35 +1,72 @@
 const db = require('../config/db');
 
-// --- HÀM 1: LẤY DANH SÁCH MENTOR ---
+// ---  LẤY DANH SÁCH MENTOR (CÓ LỌC & PHÂN TRANG) ---
 const getAllMentors = async (req, res) => {
     try {
-        const { expertise } = req.query; // Lấy môn học từ thanh địa chỉ (ví dụ: ?expertise=Nodejs)
-        
+        // 1. Lấy các tham số từ URL (req.query), thiết lập giá trị mặc định nếu người dùng không truyền
+        const page = parseInt(req.query.page) || 1;       // Mặc định là trang 1
+        const limit = parseInt(req.query.limit) || 10;    // Mặc định lấy 10 người/trang
+        const expertise = req.query.expertise;            // Lọc theo môn học
+        const search = req.query.search;                  // Tìm theo tên
+
+        // 2. Tính toán OFFSET
+        const offset = (page - 1) * limit;
+
+        // 3. Xây dựng câu lệnh SQL "động" (Dynamic SQL)
         let query = `
             SELECT u.id, u.full_name, u.avatar, m.bio, m.expertise, m.avg_rating 
             FROM users u 
             JOIN mentors m ON u.id = m.user_id
+            WHERE 1=1
         `;
-        
-        let params = [];
-        if (expertise) {
-            query += ` WHERE m.expertise = ?`;
-            params.push(expertise);
+        const queryParams = [];
+
+        // Nếu có truyền chữ tìm kiếm tên
+        if (search) {
+            query += ` AND u.full_name LIKE ?`;
+            queryParams.push(`%${search}%`); // Thêm % để tìm chuỗi chứa từ khóa ở bất kỳ đâu
         }
+
+        // Nếu có yêu cầu lọc theo môn học
+        if (expertise) {
+            query += ` AND m.expertise = ?`;
+            queryParams.push(expertise);
+        }
+
+        // 4. Thêm điều kiện Sắp xếp và Phân trang (BẮT BUỘC nằm ở cuối câu SQL)
+        query += ` ORDER BY m.avg_rating DESC LIMIT ? OFFSET ?`;
+        queryParams.push(limit, offset);
+
+        // 5. Thực thi câu lệnh SQL
+        const [mentors] = await db.query(query, queryParams);
+
+        // (Tùy chọn nâng cao) Đếm tổng số lượng Mentor thỏa mãn điều kiện để UI biết có bao nhiêu trang
+        let countQuery = `SELECT COUNT(*) as totalItems FROM users u JOIN mentors m ON u.id = m.user_id WHERE 1=1`;
+        const countParams = [];
+        if (search) { countQuery += ` AND u.full_name LIKE ?`; countParams.push(`%${search}%`); }
+        if (expertise) { countQuery += ` AND m.expertise = ?`; countParams.push(expertise); }
         
-        query += ` ORDER BY m.avg_rating DESC`;
+        const [totalResult] = await db.query(countQuery, countParams);
+        const totalItems = totalResult[0].totalItems;
+        const totalPages = Math.ceil(totalItems / limit);
 
-        const [mentors] = await db.query(query, params);
-
+        // 6. Trả kết quả về cho người dùng
         res.status(200).json({
             message: 'Lấy danh sách Mentor thành công!',
+            pagination: {
+                total_items: totalItems,
+                total_pages: totalPages,
+                current_page: page,
+                limit: limit
+            },
             data: mentors
         });
+
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server.' });
+        console.error('❌ Lỗi khi lấy danh sách Mentor:', error);
+        res.status(500).json({ message: 'Lỗi server, vui lòng thử lại sau.' });
     }
 };
-
 // --- HÀM 2: LẤY CHI TIẾT 1 MENTOR ---
 const getMentorById = async (req, res) => {
     try {

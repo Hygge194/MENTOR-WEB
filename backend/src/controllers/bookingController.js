@@ -79,4 +79,32 @@ const updateBookingStatus = async (req, res) => {
         res.status(500).json({ message: 'Lỗi hệ thống.' });
     }
 };
-module.exports = { createBooking, getIncomingBookings, updateBookingStatus };
+
+// ---   LẤY LỊCH SỬ ĐẶT LỊCH (Dành cho Học viên) ---
+const getMyBookings = async (req, res) => {
+    try {
+        const userId = req.user.id; // Lấy ID của Học viên đang đăng nhập
+
+        // JOIN với bảng users để lấy tên Mentor
+        const query = `
+            SELECT b.id, b.plan_type, b.status, b.created_at, u.full_name as mentor_name, u.email as mentor_email
+            FROM bookings b
+            JOIN users u ON b.mentor_id = u.id
+            WHERE b.user_id = ?
+            ORDER BY b.created_at DESC
+        `;
+        const [myBookings] = await db.query(query, [userId]);
+
+        res.status(200).json({
+            message: 'Lấy lịch sử học tập thành công!',
+            total: myBookings.length,
+            data: myBookings
+        });
+    } catch (error) {
+        console.error('Lỗi khi lấy lịch sử học tập:', error);
+        res.status(500).json({ message: 'Lỗi hệ thống.' });
+    }
+};
+
+module.exports = { createBooking, getIncomingBookings, 
+    updateBookingStatus, getMyBookings };

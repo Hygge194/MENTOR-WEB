@@ -3,11 +3,16 @@ const router = express.Router();
 const bookingController = require('../controllers/bookingController');
 const { verifyToken } = require('../middleware/authMiddleware');
 
-// Route: POST /api/bookings
+// 1. Tạo đặt lịch mới
 router.post('/', verifyToken, bookingController.createBooking);
-// Xem danh sách yêu cầu gửi đến mình
+
+// 2. Mentor xem danh sách học viên chờ duyệt
 router.get('/incoming', verifyToken, bookingController.getIncomingBookings);
 
-// Cập nhật trạng thái (Duyệt/Từ chối)
+// 3.Học viên xem lịch sử đặt lịch của mình
+router.get('/my-requests', verifyToken, bookingController.getMyBookings);
+
+// 4. Cập nhật trạng thái 
 router.patch('/:bookingId/status', verifyToken, bookingController.updateBookingStatus);
+
 module.exports = router;
