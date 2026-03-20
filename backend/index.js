@@ -3,14 +3,13 @@ const cors = require('cors');
 require('dotenv').config();
 const db = require('./src/config/db');
 
-console.log("👉 MÁY DÒ: Chuẩn bị import file routes..."); // Thêm dòng này
 const authRoutes = require('./src/routes/authRoutes');
-console.log("👉 MÁY DÒ: Import thành công! Chuẩn bị gắn vào /api/auth..."); // Thêm dòng này
+const mentorRoutes = require('./src/routes/mentorRoutes');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-
+app.use('/api/mentors', mentorRoutes);
 // Gắn route
 app.use('/api/auth', authRoutes);
 
