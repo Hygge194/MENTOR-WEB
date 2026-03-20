@@ -7,6 +7,9 @@ const {verifyToken} = require('../middleware/authMiddleware');
 router.post('/register', authController.register);
 router.post('/login', authController.login);
 
+console.log("Kiểm tra register:", authController.register);
+console.log("Kiểm tra login:", authController.login);
+
 router.get('/profile', verifyToken, (req, res) => {
     res.status(200).json({
         message: 'Xác thực thành công!',

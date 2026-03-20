@@ -5,14 +5,17 @@ const db = require('./src/config/db');
 
 const authRoutes = require('./src/routes/authRoutes');
 const mentorRoutes = require('./src/routes/mentorRoutes');
-
+const bookingRoutes = require('./src/routes/bookingRoutes');
 const app = express();
+const reviewRoutes = require('./src/routes/reviewRoutes');
+
 app.use(cors());
 app.use(express.json());
 app.use('/api/mentors', mentorRoutes);
+app.use('/api/bookings', bookingRoutes);
 // Gắn route
 app.use('/api/auth', authRoutes);
-
+app.use('/api/reviews', reviewRoutes);
 app.get('/', (req, res) => {
     res.send('Mentor Platform API đang chạy ngon lành!');
 });
