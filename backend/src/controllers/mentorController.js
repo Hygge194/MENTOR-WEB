@@ -1,5 +1,6 @@
 const db = require('../config/db');
-
+const fs = require('fs');
+const path = require('path');
 // ---  LẤY DANH SÁCH MENTOR (CÓ LỌC & PHÂN TRANG) ---
 const getAllMentors = async (req, res) => {
     try {
@@ -99,22 +100,38 @@ const getMentorById = async (req, res) => {
 }; 
 const updateMentorProfile = async (req, res) => {
     try {
-        const userId = req.user?.id || req.user?.userId || req.user?.sub;
+        const userId = req.user.id;
         const role = req.user.role;
-        console.log("--- DEBUG UPDATE ---");
-        console.log("User ID từ Token:", userId);
-        console.log("Role từ Token:", role);
-        // Xác thực phân quyền: Từ chối các role không hợp lệ
+
         if (role !== 'mentor') {
-            return res.status(403).json({ message: 'Forbidden: Yêu cầu quyền truy cập của Mentor.' });
+            return res.status(403).json({ message: 'Forbidden: Yêu cầu quyền của Mentor.' });
         }
 
-        const { avatar, bio, plans } = req.body;
+        const { bio, plans } = req.body;
 
-        // 1. Cập nhật bảng users
-        if (avatar) {
-            await db.query('UPDATE users SET avatar = ? WHERE id = ?', [avatar, userId]);
+        // --- PHẦN XỬ LÝ AVATAR (MỚI & CHUẨN) ---
+        if (req.file) {
+            const avatarUrl = `/uploads/${req.file.filename}`;
+
+            // 1. Lấy ảnh cũ từ DB để chuẩn bị xóa file vật lý
+            const [userRows] = await db.query('SELECT avatar FROM users WHERE id = ?', [userId]);
+            const oldAvatar = userRows[0]?.avatar;
+
+            // 2. Cập nhật đường dẫn ảnh mới vào bảng users
+            await db.query('UPDATE users SET avatar = ? WHERE id = ?', [avatarUrl, userId]);
+
+            // 3. Xóa file ảnh cũ khỏi thư mục uploads (nếu có)
+            if (oldAvatar && oldAvatar.startsWith('/uploads/')) {
+                const oldPath = path.join(__dirname, '../../', oldAvatar);
+                if (fs.existsSync(oldPath)) {
+                    fs.unlink(oldPath, (err) => {
+                        if (err) console.error("❌ Không xóa được ảnh cũ:", err);
+                        else console.log("✅ Đã xóa ảnh cũ vật lý thành công!");
+                    });
+                }
+            }
         }
+        // ---------------------------------------
 
         // 2. Cập nhật bảng mentors
         if (bio) {
@@ -124,23 +141,17 @@ const updateMentorProfile = async (req, res) => {
         // 3. Cập nhật bảng plans
         if (plans && Array.isArray(plans)) {
             for (const plan of plans) {
-                // THÊM DÒNG NÀY ĐỂ KIỂM TRA
-                console.log(`Đang cập nhật Plan: ${plan.plan_type} cho Mentor ID: ${userId}`);
-                
-                const [result] = await db.query(
+                await db.query(
                     'UPDATE plans SET price = ?, description = ? WHERE mentor_id = ? AND plan_type = ?',
                     [plan.price, plan.description, userId, plan.plan_type]
                 );
-                
-                // KIỂM TRA XEM CÓ DÒNG NÀO ĐƯỢC CẬP NHẬT KHÔNG
-                console.log(`Số dòng bị ảnh hưởng: ${result.affectedRows}`);
             }
         }
 
         res.status(200).json({ message: 'Cập nhật hồ sơ Mentor thành công.' });
 
     } catch (error) {
-        console.error('Lỗi hệ thống trong quá trình cập nhật hồ sơ Mentor:', error);
+        console.error('❌ Lỗi hệ thống:', error);
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 };

@@ -16,6 +16,7 @@ app.use('/api/bookings', bookingRoutes);
 // Gắn route
 app.use('/api/auth', authRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/uploads', express.static('uploads'));
 app.get('/', (req, res) => {
     res.send('Mentor Platform API đang chạy ngon lành!');
 });
