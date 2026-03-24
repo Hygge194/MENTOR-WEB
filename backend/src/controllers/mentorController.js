@@ -73,31 +73,49 @@ const getMentorById = async (req, res) => {
     try {
         const mentorId = req.params.id;
 
+        // 1. Lấy thông tin cơ bản của Mentor
         const queryInfo = `
-            SELECT u.id, u.full_name, u.email, u.avatar, m.bio, m.avg_rating 
-            FROM users u 
-            JOIN mentors m ON u.id = m.user_id
-            WHERE u.id = ?
-        `;
+        SELECT u.id, u.full_name, u.email, u.avatar, m.bio, 
+            (SELECT IFNULL(AVG(rating), 0) FROM reviews WHERE mentor_id = u.id) as avg_rating
+        FROM users u 
+        JOIN mentors m ON u.id = m.user_id
+        WHERE u.id = ?
+    `;
         const [mentors] = await db.query(queryInfo, [mentorId]);
 
         if (mentors.length === 0) {
             return res.status(404).json({ message: 'Không tìm thấy Mentor này!' });
         }
 
-        const [plans] = await db.query('SELECT plan_type, price, description FROM plans WHERE mentor_id = ?', [mentorId]);
+        // 2. Lấy danh sách các gói học (Plans)
+        const [plans] = await db.query(
+            'SELECT plan_type, price, description FROM plans WHERE mentor_id = ?', 
+            [mentorId]
+        );
 
+        // 3. LẤY DANH SÁCH ĐÁNH GIÁ (REVIEWS) - Phần mới thêm
+        const queryReviews = `
+            SELECT r.rating, r.comment, r.created_at, u.full_name as student_name 
+            FROM reviews r
+            JOIN users u ON r.student_id = u.id
+            WHERE r.mentor_id = ?
+            ORDER BY r.created_at DESC
+        `;
+        const [reviews] = await db.query(queryReviews, [mentorId]);
+
+        // 4. Trả về đầy đủ dữ liệu cho Frontend
         res.status(200).json({
             message: 'Lấy chi tiết Mentor thành công!',
             mentor: mentors[0],
-            plans: plans
+            plans: plans,
+            reviews: reviews // Gửi thêm mảng reviews về
         });
 
     } catch (error) {
         console.error('❌ Lỗi khi lấy chi tiết Mentor:', error);
         res.status(500).json({ message: 'Lỗi server, vui lòng thử lại sau.' });
     }
-}; 
+};
 const updateMentorProfile = async (req, res) => {
     try {
         const userId = req.user.id;
@@ -155,4 +173,17 @@ const updateMentorProfile = async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 };
-module.exports = { getAllMentors, getMentorById, updateMentorProfile };
+
+const getMyNotifications = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const [rows] = await db.query(
+            'SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC',
+            [userId]
+        );
+        res.status(200).json(rows);
+    } catch (error) {
+        res.status(500).json({ message: "Không lấy được thông báo." });
+    }
+};
+module.exports = { getAllMentors, getMentorById, updateMentorProfile, getMyNotifications };

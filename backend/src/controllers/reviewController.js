@@ -2,36 +2,35 @@ const db = require('../config/db');
 
 const createReview = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const studentId = req.user.id; 
         const { booking_id, rating, comment } = req.body;
 
-        // 1. Kiểm tra xem buổi học này có tồn tại và đã được 'accepted' chưa
         const [booking] = await db.query(
-            'SELECT * FROM bookings WHERE id = ? AND user_id = ? AND status = "accepted"',
-            [booking_id, userId]
+            'SELECT * FROM bookings WHERE id = ? AND student_id = ? AND status = "completed"',
+            [booking_id, studentId]
         );
 
         if (booking.length === 0) {
-            return res.status(400).json({ message: "Bạn chỉ có thể đánh giá những buổi học đã được chấp nhận!" });
+            return res.status(400).json({ 
+                message: "Bạn chỉ có thể đánh giá những buổi học đã hoàn thành (completed)!" 
+            });
         }
 
         const mentorId = booking[0].mentor_id;
 
         // 2. Lưu đánh giá vào bảng reviews
         await db.query(
-            'INSERT INTO reviews (booking_id, user_id, mentor_id, rating, comment) VALUES (?, ?, ?, ?, ?)',
-            [booking_id, userId, mentorId, rating, comment]
+            'INSERT INTO reviews (booking_id, student_id, mentor_id, rating, comment) VALUES (?, ?, ?, ?, ?)',
+            [booking_id, studentId, mentorId, rating, comment]
         );
 
-        // 3. TỰ ĐỘNG CẬP NHẬT avg_rating TRONG BẢNG mentors
-        // Tính toán trung bình cộng mới
         const [avgResult] = await db.query(
             'SELECT AVG(rating) as average FROM reviews WHERE mentor_id = ?',
             [mentorId]
         );
-        const newAvg = avgResult[0].average || 0;
+        
+        const newAvg = parseFloat(avgResult[0].average) || 0;
 
-        // Cập nhật lại vào bảng mentors
         await db.query('UPDATE mentors SET avg_rating = ? WHERE user_id = ?', [newAvg, mentorId]);
 
         res.status(201).json({ 
@@ -43,9 +42,39 @@ const createReview = async (req, res) => {
         if (error.code === 'ER_DUP_ENTRY') {
             return res.status(400).json({ message: "Bạn đã đánh giá buổi học này rồi!" });
         }
-        console.error(error);
+        console.error("❌ Lỗi Review:", error);
         res.status(500).json({ message: "Lỗi hệ thống." });
     }
 };
 
-module.exports = { createReview };
+const getReviewsByMentor = async (req, res) => {
+    try {
+        const { mentorId } = req.params;
+
+        // Dùng JOIN để móc nối id của học viên với bảng users để lấy full_name
+        const [reviews] = await db.query(`
+            SELECT 
+                r.id, r.rating, r.comment, r.created_at, 
+                u.full_name AS student_name
+            FROM reviews r
+            JOIN users u ON r.student_id = u.id
+            WHERE r.mentor_id = ?
+            ORDER BY r.created_at DESC
+        `, [mentorId]);
+
+        res.status(200).json({ 
+            message: "Lấy danh sách đánh giá thành công",
+            data: reviews 
+        });
+
+    } catch (error) {
+        console.error("❌ Lỗi Fetch Review:", error);
+        res.status(500).json({ message: "Lỗi hệ thống khi tải đánh giá." });
+    }
+};
+
+
+module.exports = { 
+    createReview, 
+    getReviewsByMentor 
+};

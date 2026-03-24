@@ -1,110 +1,182 @@
-const db = require('../config/db');
-
+const { sendNoti } = require('../utils/notiService');
 const createBooking = async (req, res) => {
     try {
-        // Lấy ID học viên từ Token (người đang đăng nhập)
-        const userId = req.user.id || req.user.userId; 
+        const studentId = req.user.id; 
         const { mentor_id, plan_type } = req.body;
 
-        // 1. Kiểm tra Mentor có tồn tại không
-        const [mentor] = await db.query('SELECT * FROM mentors WHERE user_id = ?', [mentor_id]);
-        if (mentor.length === 0) {
-            return res.status(404).json({ message: 'Không tìm thấy Mentor này.' });
+        // --- LOGIC GIÁ CỐ ĐỊNH MỚI ---
+        let totalPrice = 0;
+        
+        if (plan_type === 'begin') {
+            totalPrice = 15000;
+        } else if (plan_type === 'plus') {
+            totalPrice = 25000;
+        } else if (plan_type === 'premium') {
+            totalPrice = 50000;
+        } else {
+            return res.status(400).json({ message: 'Gói học không hợp lệ.' });
         }
+        // -----------------------------
 
-        // 2. Kiểm tra Mentor có cung cấp gói học (Plan) này không
-        const [plan] = await db.query(
-            'SELECT * FROM plans WHERE mentor_id = ? AND plan_type = ?', 
-            [mentor_id, plan_type]
-        );
-        if (plan.length === 0) {
-            return res.status(400).json({ message: 'Mentor không cung cấp gói học này.' });
-        }
-
-        // 3. Lưu vào bảng bookings
+        // Lưu vào Database (giữ nguyên lệnh INSERT)
         await db.query(
-            'INSERT INTO bookings (user_id, mentor_id, plan_type) VALUES (?, ?, ?)',
-            [userId, mentor_id, plan_type]
+            `INSERT INTO bookings (student_id, mentor_id, plan_type, total_price, status) 
+             VALUES (?, ?, ?, ?, ?)`,
+            [studentId, mentor_id, plan_type, totalPrice, 'pending']
         );
 
-        res.status(201).json({ message: 'Gửi yêu cầu đặt lịch thành công! Đang chờ Mentor xác nhận.' });
-
+        res.status(201).json({ message: 'Đặt lịch thành công!' });
     } catch (error) {
-        console.error('Lỗi khi tạo booking:', error);
+        console.error('❌ Lỗi:', error);
         res.status(500).json({ message: 'Lỗi hệ thống.' });
     }
 };
 //LẤY DANH SÁCH HỌC VIÊN ĐĂNG KÝ (Dành cho Mentor)
 const getIncomingBookings = async (req, res) => {
     try {
-        const mentorId = req.user.id; // ID của Mentor đang đăng nhập
+        const mentorId = req.user.id; 
 
         const query = `
-            SELECT b.id, b.plan_type, b.status, b.created_at, u.full_name as mentee_name, u.email as mentee_email
+            SELECT b.id, b.plan_type, b.status, b.created_at, b.total_price, 
+                   u.full_name as student_name, u.email as mentee_email
             FROM bookings b
-            JOIN users u ON b.user_id = u.id
+            JOIN users u ON b.student_id = u.id 
             WHERE b.mentor_id = ?
             ORDER BY b.created_at DESC
         `;
-        const [incoming] = await db.query(query, [mentorId]);
+        const [bookings] = await db.query(query, [mentorId]);
 
         res.status(200).json({
             message: 'Lấy danh sách yêu cầu thành công!',
-            data: incoming
+            data: bookings
         });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ message: 'Lỗi hệ thống.' });
     }
 };
 // ---  CẬP NHẬT TRẠNG THÁI (Chấp nhận / Từ chối) ---
+// backend/src/controllers/bookingController.js
+
+const db = require('../config/db'); // Đảm bảo đường dẫn này đúng
+// Giả sử hàm sendNoti đã được import từ file khác hoặc định nghĩa sẵn
+// const { sendNoti } = require('./notificationController'); 
+
 const updateBookingStatus = async (req, res) => {
     try {
+        // 1. Lấy dữ liệu từ Request
+        const { bookingId, status } = req.body; 
         const mentorId = req.user.id;
-        const { bookingId } = req.params;
-        const { status } = req.body; // 'accepted' hoặc 'rejected'
 
-        // Kiểm tra xem booking này có phải gửi cho Mentor này không
-        const [booking] = await db.query('SELECT * FROM bookings WHERE id = ? AND mentor_id = ?', [bookingId, mentorId]);
-        
-        if (booking.length === 0) {
-            return res.status(404).json({ message: 'Không tìm thấy yêu cầu này của bạn.' });
+        console.log("--- [DEBUG] UPDATE STATUS ---");
+        console.log("Dữ liệu nhận được:", { bookingId, status, mentorId });
+
+        // 2. Ép kiểu bookingId (Đề phòng trường hợp Frontend gửi chuỗi "123")
+        const bId = parseInt(bookingId);
+
+        // 3. Kiểm tra xem lịch hẹn có tồn tại và đúng là của Mentor này không
+        // Chỗ này cực kỳ quan trọng: Nếu mentor_id trong bảng là số, bId phải là số.
+        const [bookingRows] = await db.query(
+            'SELECT * FROM bookings WHERE id = ? AND mentor_id = ?',
+            [bId, mentorId]
+        );
+
+        if (bookingRows.length === 0) {
+            console.log("❌ LỖI: Không tìm thấy booking ID hoặc Mentor ID không khớp!");
+            return res.status(404).json({ 
+                message: "Không tìm thấy lịch hẹn hoặc bạn không có quyền duyệt yêu cầu này." 
+            });
         }
 
-        // Cập nhật trạng thái
-        await db.query('UPDATE bookings SET status = ? WHERE id = ?', [status, bookingId]);
+        console.log("✅ Đã tìm thấy lịch hẹn. Đang thực hiện UPDATE...");
 
-        res.status(200).json({ message: `Bạn đã ${status === 'accepted' ? 'ĐỒNG Ý' : 'TỪ CHỐI'} yêu cầu này.` });
+        // 4. Cập nhật trạng thái vào Database
+        const [updateResult] = await db.query(
+            'UPDATE bookings SET status = ? WHERE id = ?',
+            [status, bId]
+        );
+
+        console.log("Kết quả Update (affectedRows):", updateResult.affectedRows);
+
+        if (updateResult.affectedRows === 0) {
+            return res.status(400).json({ message: "Không thể cập nhật database!" });
+        }
+
+        // 5. Gửi thông báo cho Học viên (Bọc trong try-catch để nếu lỗi Noti thì vẫn trả về 200)
+        try {
+            const message = status === 'confirmed' 
+                ? "Mentor đã xác nhận lịch hẹn của bạn! Hãy chuẩn bị nhé." 
+                : "Rất tiếc, Mentor đã từ chối lịch hẹn này.";
+            
+            // Giả sử bạn có hàm sendNoti (nếu chưa có thì hãy tạo hoặc tạm comment dòng này)
+            if (typeof sendNoti === 'function') {
+                await sendNoti(bookingRows[0].student_id, message, mentorId);
+                console.log("✅ Đã gửi thông báo cho Student ID:", bookingRows[0].student_id);
+            }
+        } catch (notiError) {
+            console.error("⚠️ Lỗi gửi thông báo nhưng DB đã được cập nhật:", notiError.message);
+        }
+
+        // 6. Trả về kết quả thành công cho Frontend
+        return res.status(200).json({ 
+            message: `Đã ${status === 'confirmed' ? 'Xác nhận' : 'Từ chối'} lịch hẹn thành công!` 
+        });
 
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi hệ thống.' });
+        console.error("❌ LỖI HỆ THỐNG:", error);
+        return res.status(500).json({ message: "Lỗi hệ thống khi cập nhật lịch." });
     }
 };
+
 
 // ---   LẤY LỊCH SỬ ĐẶT LỊCH (Dành cho Học viên) ---
 const getMyBookings = async (req, res) => {
     try {
-        const userId = req.user.id; // Lấy ID của Học viên đang đăng nhập
-
-        // JOIN với bảng users để lấy tên Mentor
+        const studentId = req.user.id; 
         const query = `
-            SELECT b.id, b.plan_type, b.status, b.created_at, u.full_name as mentor_name, u.email as mentor_email
+            SELECT 
+                b.id, 
+                b.plan_type, 
+                b.status, 
+                b.created_at, 
+                u.full_name as mentor_name, 
+                u.email as mentor_email
             FROM bookings b
             JOIN users u ON b.mentor_id = u.id
-            WHERE b.user_id = ?
+            WHERE b.student_id = ? 
             ORDER BY b.created_at DESC
         `;
-        const [myBookings] = await db.query(query, [userId]);
+
+        const [bookings] = await db.query(query, [studentId]);
 
         res.status(200).json({
-            message: 'Lấy lịch sử học tập thành công!',
-            total: myBookings.length,
-            data: myBookings
+            message: 'Lấy lịch sử thành công!',
+            data: bookings
         });
     } catch (error) {
-        console.error('Lỗi khi lấy lịch sử học tập:', error);
-        res.status(500).json({ message: 'Lỗi hệ thống.' });
+        console.error('❌ Lỗi SQL:', error);
+        res.status(500).json({ message: 'Lỗi server' });
     }
 };
+const completeBooking = async (req, res) => {
+    try {
+        const { bookingId } = req.params;
+        const mentorId = req.user.id;
 
+        const [result] = await db.query(
+            'UPDATE bookings SET status = "completed" WHERE id = ? AND mentor_id = ? AND status = "confirmed"',
+            [bookingId, mentorId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(400).json({ message: "Không thể hoàn thành (Lịch phải ở trạng thái 'confirmed' trước đó)." });
+        }
+
+        res.status(200).json({ message: "Chúc mừng bạn đã hoàn thành buổi dạy! Học viên hiện đã có thể đánh giá bạn." });
+
+    } catch (error) {
+        res.status(500).json({ message: "Lỗi khi kết thúc buổi học." });
+    }
+};
 module.exports = { createBooking, getIncomingBookings, 
-    updateBookingStatus, getMyBookings };
+    updateBookingStatus, getMyBookings, completeBooking };

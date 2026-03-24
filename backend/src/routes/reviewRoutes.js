@@ -4,5 +4,5 @@ const reviewController = require('../controllers/reviewController');
 const { verifyToken } = require('../middleware/authMiddleware');
 
 router.post('/', verifyToken, reviewController.createReview);
-
+router.get('/:mentorId', reviewController.getReviewsByMentor);
 module.exports = router;
