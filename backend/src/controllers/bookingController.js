@@ -4,7 +4,6 @@ const createBooking = async (req, res) => {
         const studentId = req.user.id; 
         const { mentor_id, plan_type } = req.body;
 
-        // --- LOGIC GIÁ CỐ ĐỊNH MỚI ---
         let totalPrice = 0;
         
         if (plan_type === 'begin') {
@@ -16,9 +15,7 @@ const createBooking = async (req, res) => {
         } else {
             return res.status(400).json({ message: 'Gói học không hợp lệ.' });
         }
-        // -----------------------------
 
-        // Lưu vào Database (giữ nguyên lệnh INSERT)
         await db.query(
             `INSERT INTO bookings (student_id, mentor_id, plan_type, total_price, status) 
              VALUES (?, ?, ?, ?, ?)`,
@@ -56,7 +53,6 @@ const getIncomingBookings = async (req, res) => {
     }
 };
 // ---  CẬP NHẬT TRẠNG THÁI (Chấp nhận / Từ chối) ---
-// backend/src/controllers/bookingController.js
 
 const db = require('../config/db'); // Đảm bảo đường dẫn này đúng
 // Giả sử hàm sendNoti đã được import từ file khác hoặc định nghĩa sẵn
@@ -111,7 +107,7 @@ const updateBookingStatus = async (req, res) => {
             // Giả sử bạn có hàm sendNoti (nếu chưa có thì hãy tạo hoặc tạm comment dòng này)
             if (typeof sendNoti === 'function') {
                 await sendNoti(bookingRows[0].student_id, message, mentorId);
-                console.log("✅ Đã gửi thông báo cho Student ID:", bookingRows[0].student_id);
+                console.log(" Đã gửi thông báo cho Student ID:", bookingRows[0].student_id);
             }
         } catch (notiError) {
             console.error("⚠️ Lỗi gửi thông báo nhưng DB đã được cập nhật:", notiError.message);
@@ -121,9 +117,8 @@ const updateBookingStatus = async (req, res) => {
         return res.status(200).json({ 
             message: `Đã ${status === 'confirmed' ? 'Xác nhận' : 'Từ chối'} lịch hẹn thành công!` 
         });
-
     } catch (error) {
-        console.error("❌ LỖI HỆ THỐNG:", error);
+        console.error(" LỖI HỆ THỐNG:", error);
         return res.status(500).json({ message: "Lỗi hệ thống khi cập nhật lịch." });
     }
 };

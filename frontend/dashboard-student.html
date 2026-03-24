@@ -54,6 +54,7 @@
             </div>
         </div>
     </div>
+
     <div id="contact-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl transform transition-all scale-95">
             <div class="text-center">
@@ -78,6 +79,7 @@
             </button>
         </div>
     </div>
+
     <div id="review-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
             <div class="text-center mb-6">
@@ -100,6 +102,24 @@
             <div class="flex gap-3">
                 <button onclick="closeReviewModal()" class="flex-1 py-3 bg-gray-100 text-gray-500 rounded-2xl font-bold hover:bg-gray-200 transition">Hủy</button>
                 <button onclick="submitReview()" class="flex-[2] py-3 bg-amber-400 text-white rounded-2xl font-black hover:bg-amber-500 shadow-lg transition uppercase">Gửi đánh giá</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="review-modal" class="hidden fixed inset-0 bg-black/50 items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-3xl w-96 shadow-2xl">
+            <h3 class="text-xl font-bold mb-4">Đánh giá Mentor</h3>
+            <div class="flex space-x-2 mb-4 justify-center">
+                <span class="star cursor-pointer text-3xl text-gray-300" data-value="1">★</span>
+                <span class="star cursor-pointer text-3xl text-gray-300" data-value="2">★</span>
+                <span class="star cursor-pointer text-3xl text-gray-300" data-value="3">★</span>
+                <span class="star cursor-pointer text-3xl text-gray-300" data-value="4">★</span>
+                <span class="star cursor-pointer text-3xl text-gray-300" data-value="5">★</span>
+            </div>
+            <textarea id="review-comment" class="w-full border p-3 rounded-xl mb-4" placeholder="Cảm nhận của bạn..."></textarea>
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeReviewModal()" class="text-gray-500">Hủy</button>
+                <button onclick="submitReview()" class="bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold">Gửi</button>
             </div>
         </div>
     </div>

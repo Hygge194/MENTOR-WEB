@@ -54,7 +54,11 @@ function renderMentorBookings(bookings) {
                 <button onclick="updateStatus('${b.id}', 'cancelled')" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-100 transition active:scale-95">Từ chối</button>
             `;
         } else if (b.status === 'confirmed') {
-            actionHTML = `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[10px] font-black uppercase">Đã duyệt</span>`;
+            actionHTML = `
+        <button onclick="updateStatus('${b.id}', 'completed')" 
+            class="bg-green-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-green-600 transition shadow-sm">
+            Hoàn thành buổi học
+        </button> `;
         } else if (b.status === 'cancelled') {
             actionHTML = `<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-[10px] font-black uppercase">Đã từ chối</span>`;
         }

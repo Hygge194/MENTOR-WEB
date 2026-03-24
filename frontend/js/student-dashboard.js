@@ -96,5 +96,64 @@ function updateStats(bookings) {
     document.getElementById('pending-count').innerText = bookings.filter(b => b.status === 'pending').length;
     document.getElementById('confirmed-count').innerText = bookings.filter(b => b.status === 'confirmed').length;
 }
+let selectedRating = 0;
+let currentBookingId = null;
+let currentMentorId = null;
 
+// Gán sự kiện cho sao
+document.querySelectorAll('.star').forEach(star => {
+    star.addEventListener('click', (e) => {
+        selectedRating = e.target.getAttribute('data-value');
+        updateStars(selectedRating);
+    });
+});
+
+function updateStars(rating) {
+    document.querySelectorAll('.star').forEach(s => {
+        s.classList.toggle('text-amber-400', s.getAttribute('data-value') <= rating);
+        s.classList.toggle('text-gray-300', s.getAttribute('data-value') > rating);
+    });
+}
+
+async function submitReview() {
+    if (selectedRating == 0) return alert("Vui lòng chọn số sao!");
+    
+    const response = await fetch(`${API_URL}/reviews`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
+        body: JSON.stringify({
+            booking_id: currentBookingId,
+            mentor_id: currentMentorId,
+            rating: selectedRating,
+            comment: document.getElementById('review-comment').value
+        })
+    });
+
+    if (response.ok) {
+        alert("Đã gửi đánh giá thành công!");
+        location.reload();
+    }
+}
+// Thêm hàm này vào js/student-dashboard.js
+function openReviewModal(bookingId, mentorId) {
+    currentBookingId = bookingId;
+    currentMentorId = mentorId;
+    
+    // Reset lại trạng thái modal trước khi hiện
+    selectedRating = 0;
+    updateStars(0);
+    document.getElementById('review-comment').value = '';
+    
+    // Hiển thị modal (bỏ class hidden)
+    document.getElementById('review-modal').classList.remove('hidden');
+    document.getElementById('review-modal').classList.add('flex');
+}
+
+function closeReviewModal() {
+    document.getElementById('review-modal').classList.add('hidden');
+    document.getElementById('review-modal').classList.remove('flex');
+}
 loadStudentDashboard();
