@@ -61,8 +61,9 @@ function renderMentorBookings(bookings) {
         </button> `;
         } else if (b.status === 'cancelled') {
             actionHTML = `<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-[10px] font-black uppercase">Đã từ chối</span>`;
+        }else if (b.status === 'completed') {
+            actionHTML = `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider"> Đã hoàn thành</span>`;
         }
-
         return `
             <tr class="hover:bg-gray-50 transition">
                 <td class="px-6 py-4">
@@ -86,8 +87,13 @@ function renderMentorBookings(bookings) {
 }
 
 async function updateStatus(bookingId, status) {
-    if (!confirm(`Bạn có chắc chắn muốn ${status === 'confirmed' ? 'DUYỆT' : 'TỪ CHỐI'} yêu cầu này?`)) return;
+    const statusText = {
+    confirmed: 'DUYỆT',
+    cancelled: 'TỪ CHỐI',
+    completed: 'HOÀN THÀNH'
+    };
 
+    if (!confirm(`Bạn có chắc chắn muốn ${statusText[status] || 'THỰC HIỆN'} yêu cầu này?`)) return;
     const token = localStorage.getItem('accessToken');
     try {
         const response = await fetch(`${API_URL}/bookings/status`, {

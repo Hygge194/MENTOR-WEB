@@ -13,7 +13,47 @@ async function register(userData) {
         console.error("Lỗi đăng ký:", error);
     }
 }
+async function handleRegister() {
+    const full_name = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const password = document.getElementById('reg-password').value;
+    const btn = document.getElementById('register-btn');
 
+    // Validate nhanh ở Frontend
+    if (!full_name || !email || !password) {
+        return alert("⚠️ Vui lòng điền đầy đủ thông tin!");
+    }
+    if (password.length < 6) {
+        return alert("⚠️ Mật khẩu phải có ít nhất 6 ký tự!");
+    }
+
+    // Hiệu ứng Loading cho nút
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+
+    try {
+        const response = await fetch(`${API_URL}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ full_name, email, password })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert("🎉 Đăng ký thành công! Hãy đăng nhập để bắt đầu.");
+            window.location.href = 'login.html';
+        } else {
+            alert("❌ " + result.message);
+        }
+    } catch (error) {
+        console.error("Lỗi:", error);
+        alert("❌ Lỗi kết nối máy chủ, vui lòng thử lại sau.");
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>ĐĂNG KÝ TÀI KHOẢN</span>';
+    }
+}
 // 2. Hàm Đăng nhập
 async function login(email, password) {
     try {
