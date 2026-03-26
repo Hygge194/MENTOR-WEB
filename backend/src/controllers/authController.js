@@ -4,7 +4,6 @@ const bcrypt = require('bcryptjs'); // Chỉ dùng duy nhất bcryptjs
 
 const register = async (req, res) => {
     try {
-        // Chỉ lấy 3 thông tin này từ body, không quan tâm 'role' người dùng gửi gì
         const { full_name, email, password } = req.body;
 
         if (!full_name || !email || !password) {
@@ -18,7 +17,6 @@ const register = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Cố định giá trị 'student' ở tham số cuối cùng
         const [userResult] = await db.query(
             'INSERT INTO users (full_name, email, password, role) VALUES (?, ?, ?, ?)',
             [full_name, email, hashedPassword, 'student']
@@ -30,13 +28,12 @@ const register = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ Lỗi khi đăng ký:', error);
+        console.error('Lỗi khi đăng ký:', error);
         res.status(500).json({ message: 'Lỗi server, vui lòng thử lại sau.' });
     }
 };
 
 const login = async (req, res) => {
-    console.log("👉 Đã gọi vào API Login với email:", req.body.email);
     try {
         const { email, password } = req.body;
         if (!email || !password) {
@@ -57,7 +54,6 @@ const login = async (req, res) => {
         }
 
         // Tạo JWT token
-        // Chú ý: Đảm bảo đã có JWT_SECRET trong file .env
         const token = jwt.sign(
             { id: user.id, role: user.role },
             process.env.JWT_SECRET || 'fallback_secret_key', 

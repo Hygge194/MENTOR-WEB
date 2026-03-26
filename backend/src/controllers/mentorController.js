@@ -4,16 +4,14 @@ const path = require('path');
 // ---  LẤY DANH SÁCH MENTOR (CÓ LỌC & PHÂN TRANG) ---
 const getAllMentors = async (req, res) => {
     try {
-        // 1. Lấy các tham số từ URL (req.query), thiết lập giá trị mặc định nếu người dùng không truyền
-        const page = parseInt(req.query.page) || 1;       // Mặc định là trang 1
-        const limit = parseInt(req.query.limit) || 10;    // Mặc định lấy 10 người/trang
-        const expertise = req.query.expertise;            // Lọc theo môn học
-        const search = req.query.search;                  // Tìm theo tên
+        const page = parseInt(req.query.page) || 1;      
+        const limit = parseInt(req.query.limit) || 10;   
+        const expertise = req.query.expertise;           
+        const search = req.query.search;               
 
         // 2. Tính toán OFFSET
         const offset = (page - 1) * limit;
 
-        // 3. Xây dựng câu lệnh SQL "động" (Dynamic SQL)
         let query = `
             SELECT u.id, u.full_name, u.avatar, m.bio, m.expertise, m.avg_rating 
             FROM users u 
@@ -22,10 +20,9 @@ const getAllMentors = async (req, res) => {
         `;
         const queryParams = [];
 
-        // Nếu có truyền chữ tìm kiếm tên
         if (search) {
             query += ` AND u.full_name LIKE ?`;
-            queryParams.push(`%${search}%`); // Thêm % để tìm chuỗi chứa từ khóa ở bất kỳ đâu
+            queryParams.push(`%${search}%`);
         }
 
         // Nếu có yêu cầu lọc theo môn học
@@ -34,14 +31,14 @@ const getAllMentors = async (req, res) => {
             queryParams.push(expertise);
         }
 
-        // 4. Thêm điều kiện Sắp xếp và Phân trang (BẮT BUỘC nằm ở cuối câu SQL)
+        // 4. Thêm điều kiện Sắp xếp và Phân trang 
         query += ` ORDER BY m.avg_rating DESC LIMIT ? OFFSET ?`;
         queryParams.push(limit, offset);
 
         // 5. Thực thi câu lệnh SQL
         const [mentors] = await db.query(query, queryParams);
 
-        // (Tùy chọn nâng cao) Đếm tổng số lượng Mentor thỏa mãn điều kiện để UI biết có bao nhiêu trang
+        //  Đếm tổng số lượng Mentor thỏa mãn điều kiện để UI biết có bao nhiêu trang
         let countQuery = `SELECT COUNT(*) as totalItems FROM users u JOIN mentors m ON u.id = m.user_id WHERE 1=1`;
         const countParams = [];
         if (search) { countQuery += ` AND u.full_name LIKE ?`; countParams.push(`%${search}%`); }
@@ -127,27 +124,14 @@ const updateMentorProfile = async (req, res) => {
 
         const { bio, plans } = req.body;
 
-        // --- PHẦN XỬ LÝ AVATAR (MỚI & CHUẨN) ---
         if (req.file) {
             const avatarUrl = `/uploads/${req.file.filename}`;
-
             // 1. Lấy ảnh cũ từ DB để chuẩn bị xóa file vật lý
             const [userRows] = await db.query('SELECT avatar FROM users WHERE id = ?', [userId]);
             const oldAvatar = userRows[0]?.avatar;
 
             // 2. Cập nhật đường dẫn ảnh mới vào bảng users
             await db.query('UPDATE users SET avatar = ? WHERE id = ?', [avatarUrl, userId]);
-
-            // 3. Xóa file ảnh cũ khỏi thư mục uploads (nếu có)
-            if (oldAvatar && oldAvatar.startsWith('/uploads/')) {
-                const oldPath = path.join(__dirname, '../../', oldAvatar);
-                if (fs.existsSync(oldPath)) {
-                    fs.unlink(oldPath, (err) => {
-                        if (err) console.error("❌ Không xóa được ảnh cũ:", err);
-                        else console.log("✅ Đã xóa ảnh cũ vật lý thành công!");
-                    });
-                }
-            }
         }
         // ---------------------------------------
 

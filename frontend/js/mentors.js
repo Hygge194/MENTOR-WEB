@@ -13,12 +13,8 @@ async function fetchMentors() {
     }
 
     try {
-        console.log("📡 Đang gọi API: " + `${API_URL}/mentors`);
-
         const response = await fetch(`${API_URL}/mentors`);
         const result   = await response.json();
-
-        console.log("📦 Dữ liệu thô từ Database nhận về:", result);
 
         const mentors = result.data;
 

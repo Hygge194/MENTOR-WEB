@@ -54,66 +54,47 @@ const getIncomingBookings = async (req, res) => {
 };
 // ---  CẬP NHẬT TRẠNG THÁI (Chấp nhận / Từ chối) ---
 
-const db = require('../config/db'); // Đảm bảo đường dẫn này đúng
-// Giả sử hàm sendNoti đã được import từ file khác hoặc định nghĩa sẵn
-// const { sendNoti } = require('./notificationController'); 
+const db = require('../config/db'); 
 
 const updateBookingStatus = async (req, res) => {
     try {
-        // 1. Lấy dữ liệu từ Request
         const { bookingId, status } = req.body; 
         const mentorId = req.user.id;
 
-        console.log("--- [DEBUG] UPDATE STATUS ---");
-        console.log("Dữ liệu nhận được:", { bookingId, status, mentorId });
-
-        // 2. Ép kiểu bookingId (Đề phòng trường hợp Frontend gửi chuỗi "123")
         const bId = parseInt(bookingId);
-
-        // 3. Kiểm tra xem lịch hẹn có tồn tại và đúng là của Mentor này không
-        // Chỗ này cực kỳ quan trọng: Nếu mentor_id trong bảng là số, bId phải là số.
+        // kiem tra xem lich hen co ton tai va dung la cua mentor nay khong
         const [bookingRows] = await db.query(
             'SELECT * FROM bookings WHERE id = ? AND mentor_id = ?',
             [bId, mentorId]
         );
 
         if (bookingRows.length === 0) {
-            console.log("❌ LỖI: Không tìm thấy booking ID hoặc Mentor ID không khớp!");
             return res.status(404).json({ 
                 message: "Không tìm thấy lịch hẹn hoặc bạn không có quyền duyệt yêu cầu này." 
             });
         }
 
-        console.log("✅ Đã tìm thấy lịch hẹn. Đang thực hiện UPDATE...");
-
-        // 4. Cập nhật trạng thái vào Database
         const [updateResult] = await db.query(
             'UPDATE bookings SET status = ? WHERE id = ?',
             [status, bId]
         );
 
-        console.log("Kết quả Update (affectedRows):", updateResult.affectedRows);
-
         if (updateResult.affectedRows === 0) {
             return res.status(400).json({ message: "Không thể cập nhật database!" });
         }
 
-        // 5. Gửi thông báo cho Học viên (Bọc trong try-catch để nếu lỗi Noti thì vẫn trả về 200)
         try {
             const message = status === 'confirmed' 
                 ? "Mentor đã xác nhận lịch hẹn của bạn! Hãy chuẩn bị nhé." 
                 : "Rất tiếc, Mentor đã từ chối lịch hẹn này.";
             
-            // Giả sử bạn có hàm sendNoti (nếu chưa có thì hãy tạo hoặc tạm comment dòng này)
             if (typeof sendNoti === 'function') {
                 await sendNoti(bookingRows[0].student_id, message, mentorId);
-                console.log(" Đã gửi thông báo cho Student ID:", bookingRows[0].student_id);
             }
         } catch (notiError) {
             console.error("⚠️ Lỗi gửi thông báo nhưng DB đã được cập nhật:", notiError.message);
         }
 
-        // 6. Trả về kết quả thành công cho Frontend
         return res.status(200).json({ 
             message: `Đã ${status === 'confirmed' ? 'Xác nhận' : 'Từ chối'} lịch hẹn thành công!` 
         });

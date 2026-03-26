@@ -18,7 +18,7 @@ const createReview = async (req, res) => {
 
         const mentorId = booking[0].mentor_id;
 
-        // 2. Lưu đánh giá vào bảng reviews
+        // Lưu đánh giá vào bảng reviews
         await db.query(
             'INSERT INTO reviews (booking_id, student_id, mentor_id, rating, comment) VALUES (?, ?, ?, ?, ?)',
             [booking_id, studentId, mentorId, rating, comment]
@@ -51,7 +51,6 @@ const getReviewsByMentor = async (req, res) => {
     try {
         const { mentorId } = req.params;
 
-        // Dùng JOIN để móc nối id của học viên với bảng users để lấy full_name
         const [reviews] = await db.query(`
             SELECT 
                 r.id, r.rating, r.comment, r.created_at, 

@@ -137,7 +137,6 @@ async function submitReview() {
         location.reload();
     }
 }
-// Thêm hàm này vào js/student-dashboard.js
 function openReviewModal(bookingId, mentorId) {
     currentBookingId = bookingId;
     currentMentorId = mentorId;
