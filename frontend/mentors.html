@@ -1,28 +1,59 @@
-<div class="min-h-screen bg-slate-50 font-sans text-slate-800">
-    <div class="container-main">
-        
-        <header class="header-main">
-            <link rel="stylesheet" href="./styles.css">
-            <h1 class="title-main">Hệ Sinh Thái Mentor</h1>
-            
-            <div class="flex gap-2">
-                <button onclick="logout()" class="btn btn-primary">
-                    Đăng xuất
-                </button>
-                <button onclick="window.location.href='dashboard-student.html'" class="btn btn-primary">
-                    Vào trang quản lý
-                </button>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mentor Platform</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="css/mentors.css">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body >
+    <div class="min-h-screen flex">
+        <aside class="w-64 bg-white border-r hidden md:block">
+            <div class="p-6">
+                <h1 class="text-xl font-extrabold text-indigo-600"> MENTORS</h1>
             </div>
-        </header>
+            <nav class="mt-6 px-4">
+                <a href="#" class="flex items-center p-3 bg-indigo-50 text-indigo-700 rounded-xl font-bold">
+                    <span class="mr-3">📅</span> DANH SÁCH CÁC MENTOR
+                </a>
+                <button  onclick="window.location.href='dashboard-student.html'"; window.location.href='login.html'" class="w-full flex items-center p-3 text-red-500 mt-10 hover:bg-red-50 rounded-xl transition">
+                    <span class="mr-3">🚪</span> QUẢN LÝ LỊCH HỌC 
+                </button>       
+                <button onclick="logout()"; window.location.href='login.html'" class="w-full flex items-center p-3 text-red-500 mt-10 hover:bg-red-50 rounded-xl transition">
+                    <span class="mr-3">🚪</span> ĐĂNG XUẤT
+                </button>
+            </nav>
+        </aside>
 
-        <div id="mentor-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <p class="text-center text-slate-500 col-span-full">
-                Đang tải dữ liệu giảng viên...
-            </p>
-        </div>
-        
+        <main class="flex-1 p-6 md:p-10">
+
+            <div class="max-w-7xl mx-auto">
+
+                <div id="mentor-list" 
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    
+                    <p class="text-center text-slate-400 col-span-full">
+                        ⏳ Đang tải dữ liệu giảng viên...
+                    </p>
+
+                </div>
+
+            </div>
+
+        </main>
     </div>
-</div>
 
-<script src="js/auth.js"></script> 
-<script src="js/mentors.js"></script>
+    <!-- JS -->
+    <script src="js/auth.js"></script>
+    <script src="js/mentors.js"></script>
+
+</body>
+</html>
