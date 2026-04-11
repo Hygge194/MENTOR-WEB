@@ -1,29 +1,28 @@
 const mysql = require('mysql2/promise');
-require('dotenv').config();
 
+// Tạm thời bỏ qua dotenv để tránh lỗi đường dẫn tiếng Việt
 const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT || 12082, 
+    host: 'mysql-2b95fedf-mentor1.b.aivencloud.com',
+    user: 'avnadmin',
+    password: 'AVNS_N8RdJzzdHxwMe9NCmaG',
+    database: 'defaultdb',
+    port: 12082,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-
     ssl: {
         rejectUnauthorized: false
     }
 });
 
-// Kiểm tra kết nối ngay khi khởi động
+// Log để kiểm tra
 pool.getConnection()
     .then(connection => {
-        console.log('✅ Đã kết nối Database Aiven thành công!');
+        console.log('✅ Kết nối trực tiếp Aiven thành công!');
         connection.release();
     })
     .catch(err => {
-        console.error('❌ Lỗi kết nối Database:', err.message);
+        console.error('❌ Vẫn lỗi kết nối:', err.message);
     });
 
 module.exports = pool;

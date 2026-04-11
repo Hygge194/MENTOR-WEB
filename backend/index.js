@@ -10,10 +10,10 @@ const paymentRoutes = require('./src/routes/paymentRoutes');
 const reviewRoutes = require('./src/routes/reviewRoutes');
 const app = express();
 
-
 app.use(cors({
-    origin: 'https://mentor-web-2.onrender.com', // Link Frontend của bạn
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    origin: 'https://mentor-web-2.onrender.com', 
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], 
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));
 app.use(express.json());
