@@ -4,6 +4,8 @@
 //  Variables & function names UNCHANGED: fetchMentors, renderMentors
 // ============================================================
 
+let allMentors = []; // Store mentors globally for filtering
+
 async function fetchMentors() {
     const container = document.getElementById('mentor-list');
 
@@ -16,10 +18,10 @@ async function fetchMentors() {
         const response = await fetch(`${API_URL}/mentors`);
         const result   = await response.json();
 
-        const mentors = result.data;
+        allMentors = result.data; // Mảng gốc
 
-        if (Array.isArray(mentors) && mentors.length > 0) {
-            renderMentors(mentors);
+        if (Array.isArray(allMentors) && allMentors.length > 0) {
+            renderMentors(allMentors);
         } else {
             container.innerHTML = `
                 <div class="mc-state mc-state--empty">
@@ -93,3 +95,46 @@ function renderMentors(mentors) {
 
 // ── Kích hoạt hàm ──────────────────────────────────────────
 fetchMentors();
+
+// ── Search functionality ───────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            
+            if (!searchTerm) {
+                renderMentors(allMentors);
+                return;
+            }
+
+            const filteredMentors = allMentors.filter(mentor => {
+                const nameMatch = mentor.full_name?.toLowerCase().includes(searchTerm);
+                const expertiseMatch = mentor.expertise?.toLowerCase().includes(searchTerm);
+                const bioMatch = mentor.bio?.toLowerCase().includes(searchTerm);
+                
+                return nameMatch || expertiseMatch || bioMatch;
+            });
+
+            const container = document.getElementById('mentor-list');
+            if (filteredMentors.length > 0) {
+                renderMentors(filteredMentors);
+            } else {
+                container.innerHTML = `
+                    <div class="col-span-full shadow-sm bg-white rounded-xl p-10 text-center border border-gray-100 mt-4">
+                        <div class="text-gray-300 mb-4 inline-block">
+                            <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Không tìm thấy kết quả</h3>
+                        <p class="text-gray-500">Không có giảng viên hoặc khóa học nào phù hợp với từ khóa "${e.target.value}".</p>
+                        <button onclick="document.getElementById('searchInput').value=''; document.getElementById('searchInput').dispatchEvent(new Event('input'))" class="mt-4 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg font-medium hover:bg-indigo-100 transition inline-flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                            Quay lại danh sách
+                        </button>
+                    </div>`;
+            }
+        });
+    }
+});

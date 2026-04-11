@@ -42,7 +42,7 @@ const createReview = async (req, res) => {
         if (error.code === 'ER_DUP_ENTRY') {
             return res.status(400).json({ message: "Bạn đã đánh giá buổi học này rồi!" });
         }
-        console.error("❌ Lỗi Review:", error);
+        console.error("Lỗi Review:", error);
         res.status(500).json({ message: "Lỗi hệ thống." });
     }
 };
@@ -67,11 +67,10 @@ const getReviewsByMentor = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("❌ Lỗi Fetch Review:", error);
+        console.error("Lỗi Fetch Review:", error);
         res.status(500).json({ message: "Lỗi hệ thống khi tải đánh giá." });
     }
 };
-
 
 module.exports = { 
     createReview, 

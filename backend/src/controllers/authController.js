@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
-const bcrypt = require('bcryptjs'); // Chỉ dùng duy nhất bcryptjs
+const bcrypt = require('bcryptjs'); 
 
 const register = async (req, res) => {
     try {
@@ -70,7 +70,7 @@ const login = async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('❌ Lỗi khi đăng nhập:', error);
+        console.error(' Lỗi khi đăng nhập:', error);
         res.status(500).json({ message: 'Lỗi server, vui lòng thử lại sau.' });
     }
 }

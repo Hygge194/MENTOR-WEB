@@ -2,10 +2,23 @@ const { sendNoti } = require('../utils/notiService');
 const createBooking = async (req, res) => {
     try {
         const studentId = req.user.id; 
-        const { mentor_id, plan_type } = req.body;
+        const { mentor_id, plan_type, booking_date } = req.body;
 
+        // 1. Kiểm tra double booking (Trùng mentor_id + ngày nếu trạng thái hợp lệ)
+        const [existingBookings] = await db.query(
+            `SELECT * FROM bookings 
+             WHERE mentor_id = ? 
+             AND DATE(booking_date) = DATE(COALESCE(?, NOW())) 
+             AND status IN ('pending', 'confirmed')`,
+            [mentor_id, booking_date]
+        );
+
+        if (existingBookings.length > 0) {
+            return res.status(400).json({ message: 'Mentor đã có lịch học trong khung thời gian này!' });
+        }
+
+        // 2. Tính số tiền
         let totalPrice = 0;
-        
         if (plan_type === 'begin') {
             totalPrice = 15000;
         } else if (plan_type === 'plus') {
@@ -16,15 +29,22 @@ const createBooking = async (req, res) => {
             return res.status(400).json({ message: 'Gói học không hợp lệ.' });
         }
 
-        await db.query(
-            `INSERT INTO bookings (student_id, mentor_id, plan_type, total_price, status) 
-             VALUES (?, ?, ?, ?, ?)`,
-            [studentId, mentor_id, plan_type, totalPrice, 'pending']
+        // 3. Định thời gian hết hạn thanh toán (Hiện tại + 10 phút)
+        const expiresAt = new Date(Date.now() + 10 * 60000);
+
+        // 4. Khởi tạo booking với trạng thái unpaid/pending
+        const [result] = await db.query(
+            `INSERT INTO bookings (student_id, mentor_id, plan_type, booking_date, total_price, status, payment_status, expires_at) 
+             VALUES (?, ?, ?, COALESCE(?, NOW()), ?, 'pending', 'unpaid', ?)`,
+            [studentId, mentor_id, plan_type, booking_date, totalPrice, expiresAt]
         );
 
-        res.status(201).json({ message: 'Đặt lịch thành công!' });
+        res.status(201).json({ 
+            message: 'Tạo booking thành công. Chuyển sang tiến trình trả phí...',
+            bookingId: result.insertId 
+        });
     } catch (error) {
-        console.error('❌ Lỗi:', error);
+        console.error('Lỗi khi create Booking:', error);
         res.status(500).json({ message: 'Lỗi hệ thống.' });
     }
 };
@@ -92,7 +112,7 @@ const updateBookingStatus = async (req, res) => {
                 await sendNoti(bookingRows[0].student_id, message, mentorId);
             }
         } catch (notiError) {
-            console.error("⚠️ Lỗi gửi thông báo nhưng DB đã được cập nhật:", notiError.message);
+            console.error(" Lỗi gửi thông báo nhưng DB đã được cập nhật:", notiError.message);
         }
 
         return res.status(200).json({ 
@@ -130,7 +150,7 @@ const getMyBookings = async (req, res) => {
             data: bookings
         });
     } catch (error) {
-        console.error('❌ Lỗi SQL:', error);
+        console.error('Lỗi SQL:', error);
         res.status(500).json({ message: 'Lỗi server' });
     }
 };

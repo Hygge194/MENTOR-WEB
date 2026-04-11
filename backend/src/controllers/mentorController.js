@@ -61,7 +61,7 @@ const getAllMentors = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ Lỗi khi lấy danh sách Mentor:', error);
+        console.error('Lỗi khi lấy danh sách Mentor:', error);
         res.status(500).json({ message: 'Lỗi server, vui lòng thử lại sau.' });
     }
 };
@@ -109,7 +109,7 @@ const getMentorById = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ Lỗi khi lấy chi tiết Mentor:', error);
+        console.error('Lỗi khi lấy chi tiết Mentor:', error);
         res.status(500).json({ message: 'Lỗi server, vui lòng thử lại sau.' });
     }
 };
@@ -153,7 +153,7 @@ const updateMentorProfile = async (req, res) => {
         res.status(200).json({ message: 'Cập nhật hồ sơ Mentor thành công.' });
 
     } catch (error) {
-        console.error('❌ Lỗi hệ thống:', error);
+        console.error('Lỗi hệ thống:', error);
         res.status(500).json({ message: 'Internal Server Error.' });
     }
 };

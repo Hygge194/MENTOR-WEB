@@ -5,11 +5,9 @@ const path = require('path');
 // Cấu hình nơi lưu trữ và tên file
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        // Lưu vào thư mục 'uploads' ở gốc dự án
         cb(null, 'uploads/'); 
     },
     filename: function (req, file, cb) {
-        // Đổi tên file để không bao giờ bị trùng (Thêm timestamp vào trước tên gốc)
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         const ext = path.extname(file.originalname); // Lấy đuôi file (.jpg, .png)
         cb(null, file.fieldname + '-' + uniqueSuffix + ext);
