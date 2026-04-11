@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://mentor-web-1.onrender.com/api';
 
 // 1. Hàm Đăng ký
 async function register(userData) {

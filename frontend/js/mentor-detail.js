@@ -43,7 +43,7 @@ function renderMentorDetail(mentor, container) {
     container.innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
             <div class="md:col-span-1 flex flex-col items-center text-center border-b md:border-b-0 md:border-r border-slate-100 pb-8 md:pb-0 md:pr-8">
-                <img src="http://localhost:5000${mentor.avatar}" 
+                <img src="https://mentor-web-1.onrender.com${mentor.avatar}" 
                      class="w-40 h-40 rounded-full object-cover border-4 border-slate-50 shadow-md mb-6"
                      onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(mentor.full_name)}&background=1e3a8a&color=fff&size=150'">
                 

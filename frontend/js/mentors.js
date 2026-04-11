@@ -56,7 +56,7 @@ function renderMentors(mentors) {
                 <div class="mc__head">
                     <div class="mc__avatar-wrap">
                         <img
-                            src="http://localhost:5000${mentor.avatar}"
+                            src="https://mentor-web-1.onrender.com${mentor.avatar}"
                             class="mc__avatar"
                             alt="${mentor.full_name}"
                             onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(mentor.full_name)}&background=1e6fdc&color=fff&bold=true'"

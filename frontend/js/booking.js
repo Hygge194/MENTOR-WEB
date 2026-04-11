@@ -29,7 +29,7 @@ async function loadMentorDetail() {
         container.innerHTML = `
             <div class="md:flex gap-10">
                 <div class="md:w-1/3 text-center bg-white p-6 rounded-3xl shadow-sm border border-gray-100 h-fit">
-                    <img src="http://localhost:5000${mentor.avatar}" 
+                    <img src="https://mentor-web-1.onrender.com${mentor.avatar}" 
                          class="w-40 h-40 rounded-full object-cover mx-auto shadow-md border-4 border-white ring-4 ring-blue-50" 
                          onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(mentor.full_name)}'">
                     <h1 class="text-2xl font-black mt-4 text-gray-800">${mentor.full_name}</h1>

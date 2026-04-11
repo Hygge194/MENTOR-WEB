@@ -74,7 +74,7 @@ function renderBookings(bookings) {
 function openContactModal(name, email, avatar) {
     document.getElementById('modal-mentor-name').innerText = name;
     document.getElementById('modal-mentor-email').innerText = email;
-    document.getElementById('modal-mentor-avatar').src = `http://localhost:5000${avatar}`;
+    document.getElementById('modal-mentor-avatar').src = `https://mentor-web-1.onrender.com${avatar}`;
     
     const modal = document.getElementById('contact-modal');
     modal.classList.remove('hidden');
