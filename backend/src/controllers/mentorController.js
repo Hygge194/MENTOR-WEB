@@ -5,7 +5,7 @@ const path = require('path');
 const getAllMentors = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;      
-        const limit = parseInt(req.query.limit) || 10;   
+        const limit = parseInt(req.query.limit) || 10;  
         const expertise = req.query.expertise;           
         const search = req.query.search;               
 

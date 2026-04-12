@@ -5,8 +5,11 @@
 // ============================================================
 
 let allMentors = []; // Store mentors globally for filtering
+let currentPage = 1;
+let totalPages = 1;
+let currentSearch = '';
 
-async function fetchMentors() {
+async function fetchMentors(page = 1, append = false) {
     const container = document.getElementById('mentor-list');
 
     if (!container) {
@@ -15,10 +18,23 @@ async function fetchMentors() {
     }
 
     try {
-        const response = await fetch(`${API_URL}/mentors`);
-        const result   = await response.json();
+        const params = new URLSearchParams({
+            page: page,
+            limit: 10
+        });
+        if (currentSearch) params.append('search', currentSearch);
 
-        allMentors = result.data; // Mảng gốc
+        const response = await fetch(`${API_URL}/mentors?${params}`);
+        const result = await response.json();
+
+        if (append) {
+            allMentors = [...allMentors, ...result.data];
+        } else {
+            allMentors = result.data;
+        }
+
+        totalPages = result.pagination.totalPages;
+        currentPage = page;
 
         if (Array.isArray(allMentors) && allMentors.length > 0) {
             renderMentors(allMentors);
@@ -29,6 +45,8 @@ async function fetchMentors() {
                     <p class="mc-state__text">Chưa có thông tin giảng viên.</p>
                 </div>`;
         }
+
+        updateLoadMoreButton();
 
     } catch (error) {
         console.error("❌ Lỗi thực thi:", error);
@@ -93,6 +111,30 @@ function renderMentors(mentors) {
 }
 
 
+// ── Load More functionality ─────────────────────────────────
+function updateLoadMoreButton() {
+    let button = document.getElementById('load-more-btn');
+    if (!button) {
+        const container = document.getElementById('mentor-list').parentNode;
+        button = document.createElement('button');
+        button.id = 'load-more-btn';
+        button.className = 'mt-8 mx-auto block px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 shadow-md';
+        button.innerText = 'Tải thêm giảng viên';
+        button.onclick = loadMore;
+        container.appendChild(button);
+    }
+    if (currentPage >= totalPages) {
+        button.style.display = 'none';
+    } else {
+        button.style.display = 'block';
+    }
+}
+
+function loadMore() {
+    fetchMentors(currentPage + 1, true);
+}
+
+
 // ── Kích hoạt hàm ──────────────────────────────────────────
 fetchMentors();
 
@@ -102,12 +144,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase().trim();
+            currentSearch = searchTerm;
+            currentPage = 1; // Reset to first page on search
             
             if (!searchTerm) {
-                renderMentors(allMentors);
+                fetchMentors(1, false);
                 return;
             }
 
+            // For search, we fetch with search param, but since it's client-side filter now, wait
+            // Actually, since API supports search, but for simplicity, keep client-side
             const filteredMentors = allMentors.filter(mentor => {
                 const nameMatch = mentor.full_name?.toLowerCase().includes(searchTerm);
                 const expertiseMatch = mentor.expertise?.toLowerCase().includes(searchTerm);
@@ -119,6 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const container = document.getElementById('mentor-list');
             if (filteredMentors.length > 0) {
                 renderMentors(filteredMentors);
+                updateLoadMoreButton(); // Hide load more during search
             } else {
                 container.innerHTML = `
                     <div class="col-span-full shadow-sm bg-white rounded-xl p-10 text-center border border-gray-100 mt-4">
@@ -134,6 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             Quay lại danh sách
                         </button>
                     </div>`;
+                updateLoadMoreButton(); // Hide
             }
         });
     }
