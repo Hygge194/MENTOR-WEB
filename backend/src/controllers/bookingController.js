@@ -156,7 +156,7 @@ const completeBooking = async (req, res) => {
         const mentorId = req.user.id;
 
         const [result] = await db.query(
-            'UPDATE bookings SET status = "completed" WHERE id = ? AND mentor_id = ? AND status = "confirmed"',
+            "UPDATE bookings SET status = 'completed' WHERE id = ? AND mentor_id = ? AND status = 'confirmed'",
             [bookingId, mentorId]
         );
         if (result.affectedRows === 0) {

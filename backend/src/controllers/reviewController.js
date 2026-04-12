@@ -1,31 +1,12 @@
 const db = require('../config/db');
 
-const ensureReviewsTable = async () => {
-    await db.query(`
-        CREATE TABLE IF NOT EXISTS reviews (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            booking_id INT UNIQUE NOT NULL,
-            student_id INT NOT NULL,
-            mentor_id INT NOT NULL,
-            rating INT CHECK (rating BETWEEN 1 AND 5),
-            comment TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE,
-            FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
-            FOREIGN KEY (mentor_id) REFERENCES users(id) ON DELETE CASCADE
-        ) ENGINE=InnoDB;
-    `);
-};
-
 const createReview = async (req, res) => {
     try {
         const studentId = req.user.id; 
         const { booking_id, rating, comment } = req.body;
 
-        await ensureReviewsTable();
-
         const [booking] = await db.query(
-            'SELECT * FROM bookings WHERE id = ? AND student_id = ? AND status = "completed"',
+            "SELECT * FROM bookings WHERE id = ? AND student_id = ? AND status = 'completed'",
             [booking_id, studentId]
         );
 

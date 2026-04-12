@@ -22,7 +22,7 @@ const createPaymentUrl = async (req, res) => {
         // Kiểm tra hết hạn
         const now = new Date();
         if (booking.expires_at && now > new Date(booking.expires_at)) {
-            await db.query('UPDATE bookings SET status = "cancelled" WHERE id = ?', [bookingId]);
+            await db.query("UPDATE bookings SET status = 'cancelled' WHERE id = ?", [bookingId]);
             return res.status(400).json({ message: 'Booking đã hết hạn thanh toán' });
         }
 
