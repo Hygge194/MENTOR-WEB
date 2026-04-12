@@ -3,9 +3,9 @@ const mentorId = urlParams.get('id');
 
 // Định nghĩa bảng giá cố định ngay tại Frontend để hiển thị cho nhanh
 const FIXED_PRICES = {
-    'begin': 15000,
-    'plus': 25000,
-    'premium': 50000
+    'begin': 150000,
+    'plus': 250000,
+    'premium': 400000
 };
 
 async function loadMentorDetail() {
@@ -47,16 +47,87 @@ async function loadMentorDetail() {
                         </h4>
                         <div class="space-y-5">
                             <div>
-                                <label class="block text-sm font-medium mb-2 opacity-80">Chọn gói học:</label>
-                                <select id="plan_type" class="w-full p-3 rounded-xl bg-white border-none outline-none text-gray-800 font-bold focus:ring-4 focus:ring-blue-300">
-                                    <option value="begin">Beginner (15.000đ)</option>
-                                    <option value="plus">PLUS (25.000đ)</option>
-                                    <option value="premium">PREMIUM (50.000đ)</option>
-                                </select>
+                                <label class="block text-sm font-medium mb-4 opacity-80">Chọn gói học phù hợp với bạn:</label>
+                                
+                                <!-- Plan Cards -->
+                                <div class="space-y-3">
+                                    <!-- Beginner Plan -->
+                                    <div class="plan-card relative">
+                                        <input type="radio" id="begin" name="plan_type" value="begin" class="hidden peer" checked>
+                                        <label for="begin" class="block p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-green-400 peer-checked:border-green-500 peer-checked:bg-green-50 transition-all">
+                                            <div class="flex justify-between items-start mb-2">
+                                                <div>
+                                                    <span class="text-green-600 font-bold text-lg">🟢 Beginner – 150k</span>
+                                                    <span class="text-sm text-gray-500 ml-2">(Phù hợp cho người mới bắt đầu)</span>
+                                                </div>
+                                                <div class="text-right">
+                                                    <div class="font-bold text-lg">150.000đ</div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-600">
+                                                Học full nội dung khóa học<br>
+                                                Truy cập tài liệu + video<br>
+                                                Hỏi đáp qua chat (phản hồi chậm)<br>
+                                                Không có review bài chi tiết<br>
+                                                <em class="text-green-600">👉 Use case: tự học là chính, ngân sách thấp</em>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    <!-- Plus Plan -->
+                                    <div class="plan-card relative">
+                                        <input type="radio" id="plus" name="plan_type" value="plus" class="hidden peer">
+                                        <label for="plus" class="block p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-blue-400 peer-checked:border-blue-500 peer-checked:bg-blue-50 transition-all">
+                                            <div class="flex justify-between items-start mb-2">
+                                                <div>
+                                                    <span class="text-blue-600 font-bold text-lg">🔵 Plus – 250k</span>
+                                                    <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold ml-2">⭐ Recommended</span>
+                                                </div>
+                                                <div class="text-right">
+                                                    <div class="font-bold text-lg">250.000đ</div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-600">
+                                                Bao gồm toàn bộ Beginner<br>
+                                                Mentor review bài tập / project cơ bản<br>
+                                                Hỏi đáp ưu tiên hơn<br>
+                                                Có lộ trình học rõ ràng<br>
+                                                1 buổi call ngắn (Q&A / giải đáp)<br>
+                                                <em class="text-blue-600">👉 Điểm mạnh: bắt đầu có "mentor đồng hành"</em>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    <!-- Premium Plan -->
+                                    <div class="plan-card relative">
+                                        <input type="radio" id="premium" name="plan_type" value="premium" class="hidden peer">
+                                        <label for="premium" class="block p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-purple-400 peer-checked:border-purple-500 peer-checked:bg-purple-50 transition-all">
+                                            <div class="flex justify-between items-start mb-2">
+                                                <div>
+                                                    <span class="text-purple-600 font-bold text-lg">🟣 Premium – 400k</span>
+                                                    <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-semibold ml-2">🔥 Best value</span>
+                                                </div>
+                                                <div class="text-right">
+                                                    <div class="font-bold text-lg">400.000đ</div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-600">
+                                                Bao gồm toàn bộ Plus<br>
+                                                Mentor kèm 1-1 (nhiều buổi hoặc theo tuần)<br>
+                                                Review project chi tiết + sửa trực tiếp<br>
+                                                Định hướng CV / career / mock interview<br>
+                                                Support nhanh (priority)<br>
+                                                <em class="text-purple-600">👉 Use case: muốn học nhanh – đi làm – build portfolio</em>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
-                            <div id="price-summary" class="text-3xl font-black text-center py-2">
-                                15.000đ
+
+                            <div id="price-summary" class="text-3xl font-black text-center py-2 bg-gray-50 rounded-xl">
+                                150.000đ
                             </div>
+
                             <button onclick="handleBooking()" class="w-full bg-white text-blue-600 py-4 rounded-2xl font-black hover:bg-gray-100 transition shadow-lg active:scale-95">
                                 XÁC NHẬN ĐẶT LỊCH
                             </button>
@@ -96,18 +167,21 @@ async function loadMentorDetail() {
 }
 
 function setupPriceListener() {
-    const planSelect = document.getElementById('plan_type');
     const priceSummary = document.getElementById('price-summary');
-    if(!planSelect) return;
+    const planRadios = document.querySelectorAll('input[name="plan_type"]');
 
-    planSelect.addEventListener('change', () => {
-        const price = FIXED_PRICES[planSelect.value];
-        priceSummary.innerText = `${price.toLocaleString()}đ`;
+    planRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            if (radio.checked) {
+                const price = FIXED_PRICES[radio.value];
+                priceSummary.innerText = `${price.toLocaleString()}đ`;
+            }
+        });
     });
 }
 
 async function handleBooking() {
-    const planType = document.getElementById('plan_type').value;
+    const planType = document.querySelector('input[name="plan_type"]:checked').value;
     const token = localStorage.getItem('accessToken');
 
     if (!token) {
