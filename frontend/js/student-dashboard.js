@@ -132,9 +132,14 @@ async function submitReview() {
         })
     });
 
+    const result = await response.json();
+
     if (response.ok) {
         alert("Đã gửi đánh giá thành công!");
         location.reload();
+    } else {
+        alert("Lỗi: " + (result.message || "Không thể gửi đánh giá. Vui lòng thử lại."));
+        console.error("Lỗi submit review:", result);
     }
 }
 function openReviewModal(bookingId, mentorId) {
