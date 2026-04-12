@@ -41,30 +41,30 @@ async function loadMentorDetail() {
                 </div>
                 
                 <div class="md:w-2/3">
-                    <div class="bg-blue-600 p-8 rounded-3xl shadow-xl text-white mb-8">
-                        <h4 class="font-bold text-xl mb-6 flex items-center">
+                    <div class="bg-slate-50 p-8 rounded-3xl shadow-xl text-slate-800 mb-8 border border-slate-200">
+                        <h4 class="font-bold text-xl mb-6 flex items-center text-slate-800">
                             <span class="mr-2">📅</span> Đặt lịch học nhanh
                         </h4>
                         <div class="space-y-5">
                             <div>
-                                <label class="block text-sm font-medium mb-4 opacity-80">Chọn gói học phù hợp với bạn:</label>
+                                <label class="block text-sm font-medium mb-4 text-slate-600">Chọn gói học phù hợp với bạn:</label>
                                 
                                 <!-- Plan Cards -->
                                 <div class="space-y-3">
                                     <!-- Beginner Plan -->
                                     <div class="plan-card relative">
                                         <input type="radio" id="begin" name="plan_type" value="begin" class="hidden peer" checked>
-                                        <label for="begin" class="block p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-green-400 peer-checked:border-green-500 peer-checked:bg-green-50 transition-all">
+                                        <label for="begin" class="block p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-green-400 peer-checked:border-green-500 peer-checked:bg-green-50 transition-all shadow-sm hover:shadow-md">
                                             <div class="flex justify-between items-start mb-2">
                                                 <div>
                                                     <span class="text-green-600 font-bold text-lg">🟢 Beginner – 150k</span>
                                                     <span class="text-sm text-gray-500 ml-2">(Phù hợp cho người mới bắt đầu)</span>
                                                 </div>
                                                 <div class="text-right">
-                                                    <div class="font-bold text-lg">150.000đ</div>
+                                                    <div class="font-bold text-lg text-slate-800">150.000đ</div>
                                                 </div>
                                             </div>
-                                            <div class="text-sm text-gray-600">
+                                            <div class="text-sm text-slate-600">
                                                 Học full nội dung khóa học<br>
                                                 Truy cập tài liệu + video<br>
                                                 Hỏi đáp qua chat (phản hồi chậm)<br>
@@ -77,17 +77,17 @@ async function loadMentorDetail() {
                                     <!-- Plus Plan -->
                                     <div class="plan-card relative">
                                         <input type="radio" id="plus" name="plan_type" value="plus" class="hidden peer">
-                                        <label for="plus" class="block p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-blue-400 peer-checked:border-blue-500 peer-checked:bg-blue-50 transition-all">
+                                        <label for="plus" class="block p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-blue-400 peer-checked:border-blue-500 peer-checked:bg-blue-50 transition-all shadow-sm hover:shadow-md">
                                             <div class="flex justify-between items-start mb-2">
                                                 <div>
                                                     <span class="text-blue-600 font-bold text-lg">🔵 Plus – 250k</span>
                                                     <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold ml-2">⭐ Recommended</span>
                                                 </div>
                                                 <div class="text-right">
-                                                    <div class="font-bold text-lg">250.000đ</div>
+                                                    <div class="font-bold text-lg text-slate-800">250.000đ</div>
                                                 </div>
                                             </div>
-                                            <div class="text-sm text-gray-600">
+                                            <div class="text-sm text-slate-600">
                                                 Bao gồm toàn bộ Beginner<br>
                                                 Mentor review bài tập / project cơ bản<br>
                                                 Hỏi đáp ưu tiên hơn<br>
@@ -101,17 +101,17 @@ async function loadMentorDetail() {
                                     <!-- Premium Plan -->
                                     <div class="plan-card relative">
                                         <input type="radio" id="premium" name="plan_type" value="premium" class="hidden peer">
-                                        <label for="premium" class="block p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-purple-400 peer-checked:border-purple-500 peer-checked:bg-purple-50 transition-all">
+                                        <label for="premium" class="block p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-purple-400 peer-checked:border-purple-500 peer-checked:bg-purple-50 transition-all shadow-sm hover:shadow-md">
                                             <div class="flex justify-between items-start mb-2">
                                                 <div>
                                                     <span class="text-purple-600 font-bold text-lg">🟣 Premium – 400k</span>
                                                     <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-semibold ml-2">🔥 Best value</span>
                                                 </div>
                                                 <div class="text-right">
-                                                    <div class="font-bold text-lg">400.000đ</div>
+                                                    <div class="font-bold text-lg text-slate-800">400.000đ</div>
                                                 </div>
                                             </div>
-                                            <div class="text-sm text-gray-600">
+                                            <div class="text-sm text-slate-600">
                                                 Bao gồm toàn bộ Plus<br>
                                                 Mentor kèm 1-1 (nhiều buổi hoặc theo tuần)<br>
                                                 Review project chi tiết + sửa trực tiếp<br>
@@ -124,11 +124,11 @@ async function loadMentorDetail() {
                                 </div>
                             </div>
 
-                            <div id="price-summary" class="text-3xl font-black text-center py-2 bg-gray-50 rounded-xl">
+                            <div id="price-summary" class="text-3xl font-black text-center py-2 bg-slate-100 rounded-xl text-slate-800">
                                 150.000đ
                             </div>
 
-                            <button onclick="handleBooking()" class="w-full bg-white text-blue-600 py-4 rounded-2xl font-black hover:bg-gray-100 transition shadow-lg active:scale-95">
+                            <button onclick="handleBooking()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black hover:bg-blue-700 transition shadow-lg active:scale-95">
                                 XÁC NHẬN ĐẶT LỊCH
                             </button>
                         </div>
