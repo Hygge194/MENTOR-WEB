@@ -47,6 +47,8 @@ CREATE TABLE bookings (
     booking_date DATETIME NOT NULL,
     total_price DECIMAL(10, 2) NOT NULL,
     status ENUM('pending', 'confirmed', 'completed', 'cancelled') DEFAULT 'pending',
+    payment_status ENUM('unpaid', 'paid') DEFAULT 'unpaid',
+    expires_at DATETIME NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (mentor_id) REFERENCES users(id) ON DELETE CASCADE

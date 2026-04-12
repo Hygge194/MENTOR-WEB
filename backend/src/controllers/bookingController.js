@@ -1,3 +1,4 @@
+const db = require('../config/db');
 const { sendNoti } = require('../utils/notiService');
 const createBooking = async (req, res) => {
     try {
@@ -29,14 +30,11 @@ const createBooking = async (req, res) => {
             return res.status(400).json({ message: 'Gói học không hợp lệ.' });
         }
 
-        // 3. Định thời gian hết hạn thanh toán (Hiện tại + 10 phút)
-        const expiresAt = new Date(Date.now() + 10 * 60000);
-
-        // 4. Khởi tạo booking với trạng thái unpaid/pending
+        // 3. Khởi tạo booking với trạng thái pending
         const [result] = await db.query(
-            `INSERT INTO bookings (student_id, mentor_id, plan_type, booking_date, total_price, status, payment_status, expires_at) 
-             VALUES (?, ?, ?, COALESCE(?, NOW()), ?, 'pending', 'unpaid', ?)`,
-            [studentId, mentor_id, plan_type, booking_date, totalPrice, expiresAt]
+            `INSERT INTO bookings (student_id, mentor_id, plan_type, booking_date, total_price, status) 
+             VALUES (?, ?, ?, COALESCE(?, NOW()), ?, 'pending')`,
+            [studentId, mentor_id, plan_type, booking_date, totalPrice]
         );
 
         res.status(201).json({ 
@@ -73,8 +71,6 @@ const getIncomingBookings = async (req, res) => {
     }
 };
 // ---  CẬP NHẬT TRẠNG THÁI (Chấp nhận / Từ chối) ---
-
-const db = require('../config/db'); 
 
 const updateBookingStatus = async (req, res) => {
     try {
@@ -163,7 +159,11 @@ const completeBooking = async (req, res) => {
             'UPDATE bookings SET status = "completed" WHERE id = ? AND mentor_id = ? AND status = "confirmed"',
             [bookingId, mentorId]
         );
-
+const [result] = await db.query(
+    `INSERT INTO bookings (student_id, mentor_id, plan_type, booking_date, total_price, status) 
+     VALUES (?, ?, ?, COALESCE(?, NOW()), ?, 'pending')`,
+    [studentId, mentor_id, plan_type, booking_date, totalPrice]
+);
         if (result.affectedRows === 0) {
             return res.status(400).json({ message: "Không thể hoàn thành (Lịch phải ở trạng thái 'confirmed' trước đó)." });
         }
