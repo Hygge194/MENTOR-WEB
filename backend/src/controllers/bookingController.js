@@ -159,11 +159,6 @@ const completeBooking = async (req, res) => {
             'UPDATE bookings SET status = "completed" WHERE id = ? AND mentor_id = ? AND status = "confirmed"',
             [bookingId, mentorId]
         );
-const [result] = await db.query(
-    `INSERT INTO bookings (student_id, mentor_id, plan_type, booking_date, total_price, status) 
-     VALUES (?, ?, ?, COALESCE(?, NOW()), ?, 'pending')`,
-    [studentId, mentor_id, plan_type, booking_date, totalPrice]
-);
         if (result.affectedRows === 0) {
             return res.status(400).json({ message: "Không thể hoàn thành (Lịch phải ở trạng thái 'confirmed' trước đó)." });
         }
