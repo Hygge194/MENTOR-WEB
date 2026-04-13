@@ -35,7 +35,8 @@
 
     <script src="js/auth.js"></script>
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        const loginForm = document.getElementById('loginForm');
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -51,6 +52,16 @@
             } else {
                 alert(result.message || 'Sai thông tin đăng nhập');
             }
+        });
+
+        ['email', 'password'].forEach((fieldId) => {
+            const field = document.getElementById(fieldId);
+            field.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    loginForm.requestSubmit();
+                }
+            });
         });
     </script>
 </body>
