@@ -41,7 +41,6 @@ async function handleRegister() {
         const result = await response.json();
 
         if (response.ok) {
-            alert("🎉 Đăng ký thành công! Hãy đăng nhập để bắt đầu.");
             window.location.href = 'login.html';
         } else {
             alert("❌ " + result.message);

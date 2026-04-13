@@ -42,7 +42,6 @@
 
             const result = await login(email, password);
             if (result.token) {
-                alert('Đăng nhập thành công!');
                 // Điều hướng dựa trên Role
                 if (result.user.role === 'mentor') {
                     window.location.href = 'dashboard-mentor.html';
