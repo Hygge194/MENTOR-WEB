@@ -69,7 +69,6 @@ async function loadMentorDetail() {
                                                 Truy cập tài liệu + video<br>
                                                 Hỏi đáp qua chat (phản hồi chậm)<br>
                                                 Không có review bài chi tiết<br>
-                                                <em class="text-green-600">👉 Use case: tự học là chính, ngân sách thấp</em>
                                             </div>
                                         </label>
                                     </div>
@@ -93,7 +92,6 @@ async function loadMentorDetail() {
                                                 Hỏi đáp ưu tiên hơn<br>
                                                 Có lộ trình học rõ ràng<br>
                                                 1 buổi call ngắn (Q&A / giải đáp)<br>
-                                                <em class="text-blue-600">👉 Điểm mạnh: bắt đầu có "mentor đồng hành"</em>
                                             </div>
                                         </label>
                                     </div>
@@ -117,7 +115,6 @@ async function loadMentorDetail() {
                                                 Review project chi tiết + sửa trực tiếp<br>
                                                 Định hướng CV / career / mock interview<br>
                                                 Support nhanh (priority)<br>
-                                                <em class="text-purple-600">👉 Use case: muốn học nhanh – đi làm – build portfolio</em>
                                             </div>
                                         </label>
                                     </div>
