@@ -34,7 +34,7 @@ function renderMentorBookings(bookings) {
     listBody.innerHTML = bookings.map(b => {
         const price = parseFloat(b.total_price || 0);
         if(b.status === 'confirmed' || b.status === 'completed') {
-            revenue += price;
+            revenue += price * 0.9;
         }
 
         let time = "---";
