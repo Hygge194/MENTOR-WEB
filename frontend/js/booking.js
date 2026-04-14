@@ -50,7 +50,7 @@ async function loadMentorDetail() {
                                 <label class="block text-sm font-medium mb-4 text-slate-600">Chọn gói học phù hợp với bạn:</label>
                                 
                                 <!-- Plan Cards -->
-                                <div class="space-y-3">
+                                < class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
                                     <!-- Beginner Plan -->
                                     <div class="plan-card relative">
                                         <input type="radio" id="begin" name="plan_type" value="begin" class="hidden peer" checked>

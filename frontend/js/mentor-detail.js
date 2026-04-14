@@ -41,7 +41,13 @@ function renderMentorDetail(mentor, container) {
     container.classList.remove('flex', 'items-center', 'justify-center');
     
     container.innerHTML = `
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div class="flex flex-col gap-8">
+            <div class="flex flex-col md:flex-row gap-8 items-start border-b pb-8">
+            </div>
+
+            <div id="pricing-section">
+                </div>
+            </div>
             <div class="md:col-span-1 flex flex-col items-center text-center border-b md:border-b-0 md:border-r border-slate-100 pb-8 md:pb-0 md:pr-8">
                 <img src="https://mentor-web-1.onrender.com${mentor.avatar}" 
                      class="w-40 h-40 rounded-full object-cover border-4 border-slate-50 shadow-md mb-6"
