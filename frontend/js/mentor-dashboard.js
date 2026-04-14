@@ -26,15 +26,14 @@ function renderMentorBookings(bookings) {
     let revenue = 0;
 
     if (!bookings || bookings.length === 0) {
-        listBody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-gray-400">Chưa có yêu cầu đặt lịch nào.</td></tr>`;
+        listBody.innerHTML = `<tr><td colspan="4" class="p-10 text-center text-gray-400">Chưa có yêu cầu đặt lịch nào.</td></tr>`;
         document.getElementById('total-revenue').innerText = '0đ';
         return;
     }
 
     listBody.innerHTML = bookings.map(b => {
-        const price = parseFloat(b.total_price || 0);
         if(b.status === 'confirmed' || b.status === 'completed') {
-            revenue += price * 0.9; 
+            revenue += parseFloat(b.total_price || 0);
         }
 
         let time = "---";
@@ -73,11 +72,7 @@ function renderMentorBookings(bookings) {
                 </td>
                 <td class="px-6 py-4">
                     <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded uppercase">${b.plan_type}</span>
-                    <div class="font-black text-gray-700 mt-1">${price.toLocaleString()}đ</div>
-                </td>
-                <td class="px-6 py-4">
-                    <div class="font-bold text-green-600">${(price * 0.9).toLocaleString()}đ</div>
-                    <div class="text-[10px] text-gray-400 mt-1">Đã trừ 10% phí</div>
+                    <div class="font-black text-gray-700 mt-1">${parseFloat(b.total_price || 0).toLocaleString()}đ</div>
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-500 italic">${time}</td>
                 <td class="px-6 py-4 text-center">
