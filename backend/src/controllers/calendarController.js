@@ -92,4 +92,4 @@ const oauthCallback = async (req, res) => {
     }
 };
 
-module.exports = { getAuthUrl, oauthCallback, oauth2Client };
+module.exports = { getAuthUrl, oauthCallback, getOAuth2Client };
