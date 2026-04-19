@@ -84,3 +84,17 @@ ALTER TABLE bookings
 MODIFY COLUMN booking_date DATETIME DEFAULT CURRENT_TIMESTAMP;
 USE mentor_db;
 SHOW TABLES;
+
+DELIMITER $$
+
+CREATE TRIGGER before_booking_update
+BEFORE UPDATE ON bookings
+FOR EACH ROW
+BEGIN
+    IF NEW.booking_date <= NOW() + INTERVAL 1 HOUR THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Booking date must be in the future';
+    END IF;
+END$$
+
+DELIMITER ;

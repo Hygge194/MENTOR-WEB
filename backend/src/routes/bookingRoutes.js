@@ -15,4 +15,7 @@ router.get('/incoming', verifyToken, bookingController.getIncomingBookings);
 // 4. Cập nhật trạng thái 
 router.patch('/status', verifyToken, bookingController.updateBookingStatus);
 
+// 5. Giải pháp AI Suggest
+router.post('/ai-suggest', verifyToken, bookingController.aiSuggest);
+
 module.exports = router;

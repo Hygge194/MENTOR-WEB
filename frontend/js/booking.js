@@ -130,9 +130,18 @@ async function loadMentorDetail() {
                                 <input type="datetime-local" id="booking_date" class="w-full p-4 rounded-xl border-2 border-gray-200 outline-none focus:border-blue-500 transition-all text-slate-700 bg-white" required>
                             </div>
 
-                            <button onclick="handleBooking()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black hover:bg-blue-700 transition shadow-lg active:scale-95">
-                                XÁC NHẬN ĐẶT LỊCH
+                            <button onclick="handleBooking()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black hover:bg-blue-700 transition shadow-lg active:scale-95 mb-3">
+                                XÁC NHẬN ĐẶT LỊCH (Thủ công)
                             </button>
+                            <button onclick="requestAiSuggest()" id="ai-suggest-btn" class="w-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white py-4 rounded-2xl font-black hover:opacity-90 transition shadow-lg active:scale-95 flex items-center justify-center gap-2">
+                                🤖 Tự Động Phân Tích Lịch Trống (Gợi ý AI)
+                            </button>
+
+                            <!-- AI Slots Container -->
+                            <div id="ai-slots-container" class="mt-4 space-y-3 hidden">
+                                <h4 class="font-bold text-sm text-indigo-700">🤖 AI Gợi Y & Phân Tích:</h4>
+                                <div id="ai-slots-list" class="space-y-2"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -192,6 +201,13 @@ async function handleBooking() {
         return;
     }
 
+    const selectedTime = new Date(bookingDate).getTime();
+    const currentTime = new Date().getTime();
+    if (selectedTime < currentTime) {
+        alert("Thời gian học không được chọn ở trong quá khứ!");
+        return;
+    }
+
     if (!token) {
         alert("Vui lòng đăng nhập để đặt lịch!");
         window.location.href = 'login.html';
@@ -218,10 +234,70 @@ async function handleBooking() {
             window.location.href = 'dashboard-student.html';
         } else {
             alert("Lỗi: " + result.message);
-        }
+        } 
     } catch (error) {
         alert("Không thể kết nối đến server.");
     }
+}
+
+async function requestAiSuggest() {
+    const aiBtn = document.getElementById('ai-suggest-btn');
+    const container = document.getElementById('ai-slots-container');
+    const list = document.getElementById('ai-slots-list');
+    const token = localStorage.getItem('accessToken');
+    if(!token) {
+        alert("Bạn cần đăng nhập để AI phân tích lịch!");
+        return;
+    }
+
+    aiBtn.innerText = "⏳ Đang phân tích sức khỏe lịch trình...";
+    aiBtn.disabled = true;
+
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const mentorId = urlParams.get('id');
+
+        const res = await fetch(`${API_URL}/bookings/ai-suggest`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ mentor_id: mentorId })
+        });
+        const data = await res.json();
+        
+        if(res.ok) {
+            container.classList.remove('hidden');
+            let slotsHtml = '';
+            data.data.forEach((slot, index) => {
+                const dateObj = new Date(slot.startTime);
+                const displayTime = dateObj.toLocaleString('vi-VN');
+                slotsHtml += `
+                    <div class="p-3 bg-indigo-50 border border-indigo-100 rounded-xl cursor-pointer hover:bg-indigo-100 transition" 
+                        onclick="selectAiSlot('${slot.startTime}')">
+                        <div class="font-black text-indigo-700 mb-1">Lựa chọn ${index + 1}: ${displayTime}</div>
+                        <div class="text-xs text-slate-600 italic">⭐ ${slot.reason}</div>
+                    </div>
+                `;
+            });
+            list.innerHTML = slotsHtml;
+            aiBtn.innerText = "🤖 Cập nhật lại Gợi Ý (AI)";
+        } else {
+            alert(data.message);
+            aiBtn.innerText = "🤖 AI Bị Lỗi (Thử lại)";
+        }
+    } catch(err) {
+        console.error(err);
+        aiBtn.innerText = "🤖 AI Bị Lỗi (Thử lại)";
+    }
+    aiBtn.disabled = false;
+}
+
+function selectAiSlot(isoString) {
+    // Chuyển ISODate thành format html datetime-local YYYY-MM-DDTHH:mm
+    const d = new Date(isoString);
+    const tzOffset = d.getTimezoneOffset() * 60000; // offset in milliseconds
+    const localISOTime = (new Date(d - tzOffset)).toISOString().slice(0, 16);
+    document.getElementById('booking_date').value = localISOTime;
+    alert("Đã tự động điền giờ theo gợi ý AI! Bạn có thể bấm Xác Nhận Đặt Lịch ngay.");
 }
 
 loadMentorDetail();

@@ -1,5 +1,7 @@
 const db = require('../config/db');
 const { sendNoti } = require('../utils/notiService');
+const { suggestSlots } = require('../services/aiAgentService');
+
 const createBooking = async (req, res) => {
     try {
         const studentId = req.user.id; 
@@ -178,5 +180,31 @@ const completeBooking = async (req, res) => {
         res.status(500).json({ message: "Lỗi khi kết thúc buổi học." });
     }
 };
+
+const aiSuggest = async (req, res) => {
+    try {
+        const studentId = req.user.id;
+        const { mentor_id } = req.body;
+
+        const mentorConstraints = "Ưu tiên linh hoạt buổi sáng và chiều cuối tuần.";
+        const menteeConstraints = "Đang đi làm hành chính, rảnh sau 19h và rảnh T7, CN.";
+
+        // Mocks
+        const menteeSchedule = [];
+        const mentorSchedule = [];
+
+        // Call Gemini
+        const slots = await suggestSlots(mentorSchedule, menteeSchedule, mentorConstraints, menteeConstraints);
+
+        res.status(200).json({
+            message: "AI đã phân tích thành công",
+            data: slots
+        });
+    } catch (e) {
+        console.error("Lỗi AI Suggest:", e);
+        res.status(500).json({ message: "AI bị lỗi hoặc bận." });
+    }
+};
+
 module.exports = { createBooking, getIncomingBookings, 
-    updateBookingStatus, getMyBookings, completeBooking };
+    updateBookingStatus, getMyBookings, completeBooking, aiSuggest };
