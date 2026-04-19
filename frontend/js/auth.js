@@ -88,3 +88,24 @@ function checkAuth() {
         window.location.href = 'login.html';
     }
 }
+
+// 5. Hàm liên kết Google Calendar
+async function linkGoogleCalendar() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return alert("Bạn cần đăng nhập trước!");
+    
+    try {
+        const res = await fetch(`${API_URL}/calendar/auth-url`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (res.ok && data.authUrl) {
+            window.location.href = data.authUrl;
+        } else {
+            alert(data.message || "Lỗi tạo đường dẫn liên kết Google.");
+        }
+    } catch (e) {
+        console.error("Lỗi liên kết Google:", e);
+        alert("Lỗi kết nối máy chủ khi liên kết Google.");
+    }
+}

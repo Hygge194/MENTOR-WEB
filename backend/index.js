@@ -8,6 +8,7 @@ const mentorRoutes = require('./src/routes/mentorRoutes');
 const bookingRoutes = require('./src/routes/bookingRoutes');
 const paymentRoutes = require('./src/routes/paymentRoutes');
 const reviewRoutes = require('./src/routes/reviewRoutes');
+const calendarRoutes = require('./src/routes/calendarRoutes');
 const app = express();
 
 app.use(cors({
@@ -23,6 +24,7 @@ app.use('/api/payment', paymentRoutes);
 // Gắn route
 app.use('/api/auth', authRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/calendar', calendarRoutes);
 app.use('/uploads', express.static('uploads'));
 app.get('/', (req, res) => {
     res.send('Mentor Platform API đang chạy ngon lành!');

@@ -117,6 +117,47 @@ const updateBookingStatus = async (req, res) => {
             if (typeof sendNoti === 'function') {
                 await sendNoti(bookingRows[0].student_id, message, mentorId);
             }
+
+            // [NEW] Tạo sự kiện Google Calendar khi Xác Nhận
+            if (status === 'confirmed') {
+                const bookingDate = bookingRows[0].booking_date;
+                const studentId = bookingRows[0].student_id;
+                const endTime = new Date(new Date(bookingDate).getTime() + 60 * 60 * 1000); // Học 1 tiếng
+                
+                // Lấy email mentee và mentor để gửi invite
+                const [users] = await db.query('SELECT id, email, full_name, google_access_token, google_refresh_token FROM users WHERE id IN (?, ?)', [studentId, mentorId]);
+                
+                let authUser = users.find(u => u.google_access_token != null);
+                let student = users.find(u => u.id === studentId);
+                let mentor = users.find(u => u.id === mentorId);
+
+                if (authUser) {
+                    const oauth2Client = new require('googleapis').google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET);
+                    oauth2Client.setCredentials({ access_token: authUser.google_access_token, refresh_token: authUser.google_refresh_token });
+                    const calendar = require('googleapis').google.calendar({ version: 'v3', auth: oauth2Client });
+
+                    const event = {
+                        summary: `Lịch học Mentor: ${mentor.full_name} & ${student.full_name}`,
+                        description: `Buổi hướng dẫn 1-1 trên Mentor Platform.`,
+                        start: { dateTime: new Date(bookingDate).toISOString(), timeZone: 'Asia/Ho_Chi_Minh' },
+                        end: { dateTime: endTime.toISOString(), timeZone: 'Asia/Ho_Chi_Minh' },
+                        attendees: [{ email: student.email }, { email: mentor.email }],
+                        conferenceData: {
+                            createRequest: {
+                                requestId: `mentor-meet-${bookingRows[0].id}-${Date.now()}`,
+                                conferenceSolutionKey: { type: 'hangoutsMeet' }
+                            }
+                        }
+                    };
+
+                    await calendar.events.insert({
+                        calendarId: 'primary',
+                        conferenceDataVersion: 1,
+                        requestBody: event,
+                        sendUpdates: 'all' // Gửi email cho attendee
+                    });
+                }
+            }
         } catch (notiError) {
             console.error(" Lỗi gửi thông báo nhưng DB đã được cập nhật:", notiError.message);
         }
@@ -186,12 +227,38 @@ const aiSuggest = async (req, res) => {
         const studentId = req.user.id;
         const { mentor_id } = req.body;
 
-        const mentorConstraints = "Ưu tiên linh hoạt buổi sáng và chiều cuối tuần.";
-        const menteeConstraints = "Đang đi làm hành chính, rảnh sau 19h và rảnh T7, CN.";
+        const [menteeRows] = await db.query('SELECT scheduling_constraints FROM users WHERE id = ?', [studentId]);
+        const [mentorRows] = await db.query('SELECT scheduling_constraints FROM users WHERE id = ?', [mentor_id]);
 
-        // Mocks
-        const menteeSchedule = [];
-        const mentorSchedule = [];
+        const mentorConstraints = mentorRows.length > 0 ? (mentorRows[0].scheduling_constraints || "Ưu tiên linh hoạt.") : "";
+        const menteeConstraints = menteeRows.length > 0 ? (menteeRows[0].scheduling_constraints || "Rảnh sau 19h và cuối tuần.") : "";
+
+        // Function helper lấy lịch rảnh Google Calendar
+        const { google } = require('googleapis');
+        const getFreeBusy = async (userId) => {
+            const [uRows] = await db.query('SELECT google_access_token, google_refresh_token FROM users WHERE id = ?', [userId]);
+            if (uRows.length && uRows[0].google_access_token) {
+                const oauth2Client = new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET);
+                oauth2Client.setCredentials({ access_token: uRows[0].google_access_token, refresh_token: uRows[0].google_refresh_token });
+                const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+                
+                const timeMin = new Date().toISOString();
+                const timeMax = new Date();
+                timeMax.setDate(timeMax.getDate() + 7); // Phân tích 7 ngày tới
+                const res = await calendar.freebusy.query({
+                    requestBody: {
+                         timeMin: timeMin,
+                         timeMax: timeMax.toISOString(),
+                         items: [{ id: 'primary' }]
+                    }
+                });
+                return res.data.calendars['primary'].busy || [];
+            }
+            return []; // rỗng nếu chưa link
+        };
+
+        const menteeSchedule = await getFreeBusy(studentId);
+        const mentorSchedule = await getFreeBusy(mentor_id);
 
         // Call Gemini
         const slots = await suggestSlots(mentorSchedule, menteeSchedule, mentorConstraints, menteeConstraints);
