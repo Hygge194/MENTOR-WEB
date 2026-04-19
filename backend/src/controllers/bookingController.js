@@ -18,6 +18,14 @@ const createBooking = async (req, res) => {
             return res.status(400).json({ message: 'Mentor đã có lịch học trong khung thời gian này!' });
         }
 
+        // 1.5 Kiểm tra thời gian không được ở quá khứ
+        const bookingTime = new Date(booking_date).getTime();
+        const currentTime = new Date().getTime();
+        if (bookingTime < currentTime) {
+            return res.status(400).json({ message: 'Thời gian học không được ở trong quá khứ!' });
+        }
+
+
         // 2. Tính số tiền
         let totalPrice = 0;
         if (plan_type === 'begin') {
