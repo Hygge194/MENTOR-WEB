@@ -26,7 +26,7 @@ function renderMentorBookings(bookings) {
     let revenue = 0;
 
     if (!bookings || bookings.length === 0) {
-        listBody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-gray-400">Chưa có yêu cầu đặt lịch nào.</td></tr>`;
+        listBody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-gray-400">Chưa có yêu cầu đặt lịch nào.</td></tr>`;
         document.getElementById('total-revenue').innerText = '0đ';
         return;
     }
@@ -83,6 +83,9 @@ function renderMentorBookings(bookings) {
                 <td class="px-6 py-4">
                     <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded uppercase">${b.plan_type}</span>
                     <div class="font-black text-gray-700 mt-1">${parseFloat(b.total_price || 0).toLocaleString()}đ</div>
+                </td>
+                <td class="px-6 py-4 text-sm font-black text-green-600">
+                    +${(parseFloat(b.total_price || 0) * 0.9).toLocaleString()}đ
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-500 italic">${time}</td>
                 <td class="px-6 py-4 text-sm text-gray-800 font-bold">${bookTime}</td>
