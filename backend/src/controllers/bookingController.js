@@ -31,11 +31,11 @@ const createBooking = async (req, res) => {
         // 2. Tính số tiền
         let totalPrice = 0;
         if (plan_type === 'begin') {
-            totalPrice = 15000;
+            totalPrice = 150000;
         } else if (plan_type === 'plus') {
-            totalPrice = 25000;
+            totalPrice = 250000;
         } else if (plan_type === 'premium') {
-            totalPrice = 50000;
+            totalPrice = 400000;
         } else {
             return res.status(400).json({ message: 'Gói học không hợp lệ.' });
         }
