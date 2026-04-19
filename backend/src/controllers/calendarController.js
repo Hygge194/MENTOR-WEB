@@ -82,8 +82,8 @@ const oauthCallback = async (req, res) => {
             : 'http://localhost:5500'; // Đổi theo cổng Frontend nếu lướt cục bộ
         
         res.send(`<script>
-            alert("Đã kết nối Google Calendar thành công!");
-            window.location.href = "/";
+            alert("Đã kết nối Google Calendar thành công! Hệ thống sẽ chuyển hướng bạn đến Lịch xem ngay.");
+            window.location.href = "https://calendar.google.com/calendar/u/0/r?pli=1";
         </script>`);
         
     } catch (error) {
