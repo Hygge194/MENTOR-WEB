@@ -1,12 +1,22 @@
 const { google } = require('googleapis');
 const db = require('../config/db');
 
-// Khởi tạo OAuth2 Client (Lấy Credentials từ biến môi trường)
-const oauth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI || 'http://localhost:12082/api/calendar/oauth-callback' // Fallback cho DEV
-);
+// Lấy OAuth2 Client tương ứng với domain gọi tới
+const getOAuth2Client = (req) => {
+    // Ưu tiên biến môi trường, sau đó đến host thật
+    let redirectUri = process.env.GOOGLE_REDIRECT_URI;
+    if (!redirectUri && req) {
+        const host = req.get('host');
+        const protocol = host.includes('localhost') ? 'http' : 'https';
+        redirectUri = `${protocol}://${host}/api/calendar/oauth-callback`;
+    }
+    
+    return new google.auth.OAuth2(
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET,
+        redirectUri || 'http://localhost:12082/api/calendar/oauth-callback'
+    );
+};
 
 // Mảng quyền yêu cầu khi liên kết
 const SCOPES = [
@@ -20,11 +30,12 @@ const SCOPES = [
  */
 const getAuthUrl = (req, res) => {
     try {
-        const userId = req.user.id; // Lấy từ verifyToken của app mình
-        // Đính kèm ID của user vào tham số trạng thái (state) để sau khi Google chuyển về, mình biết token này của ai
+        const userId = req.user.id; 
+        const oauth2Client = getOAuth2Client(req);
+        
         const url = oauth2Client.generateAuthUrl({
-            access_type: 'offline', // Cần thiết để lấy refresh_token
-            prompt: 'consent',      // Bắt buộc Google trả về refresh_token mỗi lần ấn liên kết
+            access_type: 'offline', 
+            prompt: 'consent',     
             scope: SCOPES,
             state: userId.toString() 
         });
@@ -40,12 +51,13 @@ const getAuthUrl = (req, res) => {
  */
 const oauthCallback = async (req, res) => {
     try {
-        const { code, state } = req.query; // state chính là userId
+        const { code, state } = req.query; 
         if (!code || !state) {
             return res.status(400).send("Thiếu tham số xác thực từ Google.");
         }
 
         const userId = parseInt(state, 10);
+        const oauth2Client = getOAuth2Client(req);
 
         // Đổi code lấy Access & Refresh Token
         const { tokens } = await oauth2Client.getToken(code);
