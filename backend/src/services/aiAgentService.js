@@ -1,7 +1,8 @@
-const { GoogleGenAI } = require('@google/genai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 // Cấu hình Google Gemini
-const ai = new GoogleGenAI({}); // Tự động lấy từ process.env.GEMINI_API_KEY
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const ai = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 /**
  * Xử lý hàm Suggestion Slots của AI Agent
@@ -35,15 +36,8 @@ HÃY TRẢ VỀ CHÍNH XÁC THEO ĐỊNH DẠNG JSON (Không có markdown block 
 `;
 
     try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-1.5-flash',
-            contents: prompt,
-            config: {
-                temperature: 0.2, // Yêu cầu tính logic cao
-            }
-        });
-
-        let textString = response.text;
+        const result = await ai.generateContent(prompt);
+        let textString = result.response.text();
         // Chuẩn hóa JSON phòng trường hợp AI bọc markdown
         textString = textString.replace(/```json/g, "").replace(/```/g, "").trim();
         const slots = JSON.parse(textString);
