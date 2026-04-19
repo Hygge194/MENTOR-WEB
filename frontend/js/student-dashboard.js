@@ -55,10 +55,22 @@ function renderBookings(bookings) {
                </button>`
             : '';
 
+        let bookTime = "---";
+        if (b.booking_date) {
+            const dateObj = new Date(b.booking_date);
+            if (!isNaN(dateObj.getTime())) {
+                bookTime = dateObj.toLocaleString('vi-VN', {
+                    hour: '2-digit', minute: '2-digit',
+                    day: '2-digit', month: '2-digit', year: 'numeric'
+                });
+            }
+        }
+
         return `
             <tr class="hover:bg-gray-50 transition border-b border-gray-50">
                 <td class="px-6 py-4 font-bold text-gray-800">${b.mentor_name}</td>
                 <td class="px-6 py-4 uppercase text-xs font-semibold text-gray-500">${b.plan_type}</td>
+                <td class="px-6 py-4 text-sm text-gray-800 font-bold">${bookTime}</td>
                 <td class="px-6 py-4">
                     <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase ${statusClass}">${statusText}</span>
                 </td>

@@ -26,7 +26,7 @@ function renderMentorBookings(bookings) {
     let revenue = 0;
 
     if (!bookings || bookings.length === 0) {
-        listBody.innerHTML = `<tr><td colspan="4" class="p-10 text-center text-gray-400">Chưa có yêu cầu đặt lịch nào.</td></tr>`;
+        listBody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-gray-400">Chưa có yêu cầu đặt lịch nào.</td></tr>`;
         document.getElementById('total-revenue').innerText = '0đ';
         return;
     }
@@ -41,6 +41,16 @@ function renderMentorBookings(bookings) {
             const dateObj = new Date(b.created_at);
             if (!isNaN(dateObj.getTime())) {
                 time = dateObj.toLocaleString('vi-VN', {
+                    hour: '2-digit', minute: '2-digit',
+                    day: '2-digit', month: '2-digit', year: 'numeric'
+                });
+            }
+        }
+        let bookTime = "---";
+        if (b.booking_date) {
+            const dateObj = new Date(b.booking_date);
+            if (!isNaN(dateObj.getTime())) {
+                bookTime = dateObj.toLocaleString('vi-VN', {
                     hour: '2-digit', minute: '2-digit',
                     day: '2-digit', month: '2-digit', year: 'numeric'
                 });
@@ -75,6 +85,7 @@ function renderMentorBookings(bookings) {
                     <div class="font-black text-gray-700 mt-1">${parseFloat(b.total_price || 0).toLocaleString()}đ</div>
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-500 italic">${time}</td>
+                <td class="px-6 py-4 text-sm text-gray-800 font-bold">${bookTime}</td>
                 <td class="px-6 py-4 text-center">
                     ${actionHTML}
                 </td>

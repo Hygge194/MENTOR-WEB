@@ -1,4 +1,4 @@
-const urlParams = new URLSearchParams(window.location.search);
+const urlParams = new URLSearchParams(window.location.search); 
 const mentorId = urlParams.get('id');
 
 // Định nghĩa bảng giá cố định ngay tại Frontend để hiển thị cho nhanh
@@ -125,6 +125,11 @@ async function loadMentorDetail() {
                                 150.000đ
                             </div>
 
+                            <div class="mt-4 mb-4">
+                                <label for="booking_date" class="block text-sm font-medium mb-2 text-slate-600">Chọn thời gian học (Dự kiến):</label>
+                                <input type="datetime-local" id="booking_date" class="w-full p-4 rounded-xl border-2 border-gray-200 outline-none focus:border-blue-500 transition-all text-slate-700 bg-white" required>
+                            </div>
+
                             <button onclick="handleBooking()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black hover:bg-blue-700 transition shadow-lg active:scale-95">
                                 XÁC NHẬN ĐẶT LỊCH
                             </button>
@@ -179,7 +184,13 @@ function setupPriceListener() {
 
 async function handleBooking() {
     const planType = document.querySelector('input[name="plan_type"]:checked').value;
+    const bookingDate = document.getElementById('booking_date').value;
     const token = localStorage.getItem('accessToken');
+
+    if (!bookingDate) {
+        alert("Vui lòng chọn thời gian học dự kiến!");
+        return;
+    }
 
     if (!token) {
         alert("Vui lòng đăng nhập để đặt lịch!");
@@ -196,7 +207,8 @@ async function handleBooking() {
             },
             body: JSON.stringify({
                 mentor_id: mentorId,
-                plan_type: planType
+                plan_type: planType,
+                booking_date: bookingDate
             })
         });
 

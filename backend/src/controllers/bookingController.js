@@ -131,6 +131,7 @@ const getMyBookings = async (req, res) => {
                 b.plan_type, 
                 b.status, 
                 b.created_at, 
+                b.booking_date,
                 u.full_name as mentor_name, 
                 u.email as mentor_email
             FROM bookings b
