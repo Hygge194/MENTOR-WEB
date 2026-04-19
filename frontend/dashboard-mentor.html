@@ -25,51 +25,57 @@
                 </button>
             </nav>
         </aside>
+<main class="flex-1 p-6 md:p-10 overflow-y-auto">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div>
+            <h2 class="text-2xl font-black text-gray-800">Bảng điều khiển Mentor</h2>
+            <p class="text-gray-500 text-sm">Quản lý các yêu cầu học tập mới nhất của bạn.</p>
+        </div>
+        
+        <div class="flex flex-wrap gap-4 items-center">
+            <button onclick="linkGoogleCalendar()" class="bg-indigo-100 text-indigo-700 px-5 py-3 rounded-2xl font-bold flex items-center gap-2 hover:bg-indigo-200 transition shadow-sm border border-indigo-200 h-14">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 5h5v5h-5z"/></svg> 
+                Liên kết Calendar
+            </button>
 
-        <main class="flex-1 p-6 md:p-10">
-            <div class="flex justify-between items-center mb-8">
+            <div class="bg-white px-6 py-3 rounded-2xl shadow-sm border border-indigo-100 flex items-center h-14">
+                <div class="mr-4 bg-indigo-100 p-2 rounded-xl text-indigo-600">💰</div>
                 <div>
-                    <h2 class="text-2xl font-black text-gray-800">Bảng điều khiển Mentor</h2>
-                    <p class="text-gray-500 text-sm">Quản lý các yêu cầu học tập mới nhất của bạn.</p>
-                </div>
-                <div class="flex gap-4">
-                    <button onclick="linkGoogleCalendar()" class="bg-indigo-100 text-indigo-700 px-5 py-4 rounded-3xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-200 transition shadow-sm border border-indigo-200 h-[72px]">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 5h5v5h-5z"/></svg> Liên kết Calendar
-                    </button>
-                    <div class="bg-white px-6 py-4 rounded-3xl shadow-sm border border-indigo-100 flex items-center h-[72px]">
-                        <div class="mr-4 bg-indigo-100 p-3 rounded-2xl text-xl"></div>
-                        <div>
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tổng thu nhập</p>
-                            <h3 id="total-revenue" class="text-xl font-black text-indigo-600">0đ</h3>
-                        </div>
-                    </div>
-                </div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Tổng thu nhập</p>
+                    <h3 id="total-revenue" class="text-lg font-black text-indigo-600">0đ</h3>
                 </div>
             </div>
-
-            <div class="bg-white rounded-[2rem] shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="bg-gray-50/50 border-b border-gray-100">
-                                <th class="px-6 py-5 text-[11px] font-black text-gray-400 uppercase tracking-wider">Học viên</th>
-                                <th class="px-6 py-5 text-[11px] font-black text-gray-400 uppercase tracking-wider">Gói học & Giá</th>
-                                <th class="px-6 py-5 text-[11px] font-black text-gray-400 uppercase tracking-wider">Thu nhập( trừ 10% hoa hồng)</th>
-                                <th class="px-6 py-5 text-[11px] font-black text-gray-400 uppercase tracking-wider">Thời gian đăng ký</th>
-                                <th class="px-6 py-5 text-[11px] font-black text-gray-400 uppercase tracking-wider">Thời gian học</th>
-                                <th class="px-6 py-5 text-[11px] font-black text-gray-400 uppercase tracking-wider text-center">Trạng thái / Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody id="mentor-booking-list" class="divide-y divide-gray-50">
-                            <tr>
-                                <td colspan="5" class="p-10 text-center text-gray-400">Đang tải dữ liệu...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </main>
+        </div>
     </div>
+
+    <div class="bg-white rounded-[2rem] shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50/50 border-b border-gray-100">
+                        <th class="px-6 py-5 text-[11px] font-black text-gray-400 uppercase tracking-wider">Học viên</th>
+                        <th class="px-6 py-5 text-[11px] font-black text-gray-400 uppercase tracking-wider">Gói học & Giá</th>
+                        <th class="px-6 py-5 text-[11px] font-black text-gray-400 uppercase tracking-wider">Thu nhập (Sau phí)</th>
+                        <th class="px-6 py-5 text-[11px] font-black text-gray-400 uppercase tracking-wider">Ngày đăng ký</th>
+                        <th class="px-6 py-5 text-[11px] font-black text-gray-400 uppercase tracking-wider">Lịch học</th>
+                        <th class="px-6 py-5 text-[11px] font-black text-gray-400 uppercase tracking-wider text-center">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody id="mentor-booking-list" class="divide-y divide-gray-50">
+                    <tr>
+                        <td colspan="6" class="p-20 text-center">
+                            <div class="flex flex-col items-center gap-2">
+                                <div class="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                                <p class="text-gray-400 font-medium">Đang tìm kiếm yêu cầu mới...</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
 
     <script src="js/auth.js"></script>
     <script src="js/mentor-dashboard.js"></script>
