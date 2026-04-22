@@ -2,8 +2,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 // Cấu hình Google Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const ai = genAI.getGenerativeModel({ model: "gemini-pro" });
-
+const ai = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 /**
  * Xử lý hàm Suggestion Slots của AI Agent
  * @param {Array} mentorSchedule - Các sự kiện hiện tại của mentor 
