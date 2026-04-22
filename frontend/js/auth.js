@@ -47,7 +47,7 @@ async function handleRegister() {
         }
     } catch (error) {
         console.error("Lỗi:", error);
-        alert("❌ Lỗi kết nối máy chủ, vui lòng thử lại sau.");
+        alert(" Lỗi kết nối máy chủ, vui lòng thử lại sau.");
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<span>ĐĂNG KÝ TÀI KHOẢN</span>';

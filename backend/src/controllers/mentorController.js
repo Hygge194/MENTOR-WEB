@@ -113,50 +113,6 @@ const getMentorById = async (req, res) => {
         res.status(500).json({ message: 'Lỗi server, vui lòng thử lại sau.' });
     }
 };
-const updateMentorProfile = async (req, res) => {
-    try {
-        const userId = req.user.id;
-        const role = req.user.role;
-
-        if (role !== 'mentor') {
-            return res.status(403).json({ message: 'Forbidden: Yêu cầu quyền của Mentor.' });
-        }
-
-        const { bio, plans } = req.body;
-
-        if (req.file) {
-            const avatarUrl = `/uploads/${req.file.filename}`;
-            // 1. Lấy ảnh cũ từ DB để chuẩn bị xóa file vật lý
-            const [userRows] = await db.query('SELECT avatar FROM users WHERE id = ?', [userId]);
-            const oldAvatar = userRows[0]?.avatar;
-
-            // 2. Cập nhật đường dẫn ảnh mới vào bảng users
-            await db.query('UPDATE users SET avatar = ? WHERE id = ?', [avatarUrl, userId]);
-        }
-        // ---------------------------------------
-
-        // 2. Cập nhật bảng mentors
-        if (bio) {
-            await db.query('UPDATE mentors SET bio = ? WHERE user_id = ?', [bio, userId]);
-        }
-
-        // 3. Cập nhật bảng plans
-        if (plans && Array.isArray(plans)) {
-            for (const plan of plans) {
-                await db.query(
-                    'UPDATE plans SET price = ?, description = ? WHERE mentor_id = ? AND plan_type = ?',
-                    [plan.price, plan.description, userId, plan.plan_type]
-                );
-            }
-        }
-
-        res.status(200).json({ message: 'Cập nhật hồ sơ Mentor thành công.' });
-
-    } catch (error) {
-        console.error('Lỗi hệ thống:', error);
-        res.status(500).json({ message: 'Internal Server Error.' });
-    }
-};
 
 const getMyNotifications = async (req, res) => {
     try {
@@ -170,4 +126,4 @@ const getMyNotifications = async (req, res) => {
         res.status(500).json({ message: "Không lấy được thông báo." });
     }
 };
-module.exports = { getAllMentors, getMentorById, updateMentorProfile, getMyNotifications };
+module.exports = { getAllMentors, getMentorById, getMyNotifications };
