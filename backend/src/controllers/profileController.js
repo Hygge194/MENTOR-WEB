@@ -8,7 +8,7 @@ const getProfile = async (req, res) => {
         const userId = req.user.id;
         const role = req.user.role;
 
-        const [userRows] = await db.query('SELECT id, full_name, email, avatar, role, scheduling_constraints FROM users WHERE id = ?', [userId]);
+        const [userRows] = await db.query('SELECT id, full_name, email, phone, avatar, role, scheduling_constraints FROM users WHERE id = ?', [userId]);
 
         if (userRows.length === 0) {
             return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
@@ -42,7 +42,7 @@ const updateProfile = async (req, res) => {
         const role = req.user.role;
 
         // Các trường cho bảng 'users' (chung cho cả hai)
-        const { full_name, scheduling_constraints } = req.body;
+        const { full_name, scheduling_constraints, phone } = req.body;
         // Các trường cho bảng 'mentors'
         const { bio, expertise } = req.body;
         // Các trường cho bảng 'plans' (dành cho mentor, gửi lên dưới dạng chuỗi JSON)
@@ -52,6 +52,7 @@ const updateProfile = async (req, res) => {
         const userUpdateFields = {};
         if (full_name) userUpdateFields.full_name = full_name;
         if (scheduling_constraints) userUpdateFields.scheduling_constraints = scheduling_constraints;
+        if (phone !== undefined) userUpdateFields.phone = phone;
 
         // Xử lý upload avatar
         if (req.file) {

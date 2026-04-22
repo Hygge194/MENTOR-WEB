@@ -42,6 +42,7 @@ function renderProfileForm(profile) {
     // Các trường chung
     document.getElementById('profile-fullname').value = profile.full_name || '';
     document.getElementById('profile-email').value = profile.email || '';
+    document.getElementById('profile-phone').value = profile.phone || '';
     document.getElementById('profile-avatar-preview').src = profile.avatar ? `${API_URL.replace('/api', '')}${profile.avatar}` : 'https://via.placeholder.com/150';
     document.getElementById('profile-scheduling-constraints').value = profile.scheduling_constraints || '';
 

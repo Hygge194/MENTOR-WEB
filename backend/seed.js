@@ -19,35 +19,35 @@ async function runSeeder() {
         // 3. Nạp Users (5 Mentor, 5 Student)
 const userData = [
     // ===== STUDENTS =====
-    ['Nguyễn Hoàng Nam', 'nam@student.com', hashedPass, 'student'],
-    ['Lê Thị Tú', 'tu@student.com', hashedPass, 'student'],
-    ['Trần Thanh', 'thanh@student.com', hashedPass, 'student'],
-    ['Phạm Anh', 'anh@student.com', hashedPass, 'student'],
-    ['Vũ Linh', 'linh@student.com', hashedPass, 'student'],
+    ['Nguyễn Hoàng Nam', 'nam@student.com', hashedPass, 'student', '0901000001'],
+    ['Lê Thị Tú', 'tu@student.com', hashedPass, 'student', '0901000002'],
+    ['Trần Thanh', 'thanh@student.com', hashedPass, 'student', '0901000003'],
+    ['Phạm Anh', 'anh@student.com', hashedPass, 'student', '0901000004'],
+    ['Vũ Linh', 'linh@student.com', hashedPass, 'student', '0901000005'],
 
     // ===== MENTORS (20 người) =====
-    ['Nguyễn Minh Quân', 'quan.nguyen@gmail.com', hashedPass, 'mentor'],
-    ['Trần Đức Huy', 'huy.tran@gmail.com', hashedPass, 'mentor'],
-    ['Lê Hoàng Phúc', 'phuc.le@gmail.com', hashedPass, 'mentor'],
-    ['Phạm Gia Bảo', 'bao.pham@gmail.com', hashedPass, 'mentor'],
-    ['Võ Thanh Tùng', 'tung.vo@gmail.com', hashedPass, 'mentor'],
-    ['Đặng Quốc Khánh', 'khanh.dang@gmail.com', hashedPass, 'mentor'],
-    ['Bùi Anh Tuấn', 'tuan.bui@gmail.com', hashedPass, 'mentor'],
-    ['Phan Minh Trí', 'tri.phan@gmail.com', hashedPass, 'mentor'],
-    ['Ngô Thành Đạt', 'dat.ngo@gmail.com', hashedPass, 'mentor'],
-    ['Huỳnh Gia Hưng', 'hung.huynh@gmail.com', hashedPass, 'mentor'],
-    ['Đỗ Minh Khang', 'khang.do@gmail.com', hashedPass, 'mentor'],
-    ['Trương Nhật Nam', 'nam.truong@gmail.com', hashedPass, 'mentor'],
-    ['Lý Hoàng Long', 'long.ly@gmail.com', hashedPass, 'mentor'],
-    ['Mai Thanh Phong', 'phong.mai@gmail.com', hashedPass, 'mentor'],
-    ['Nguyễn Hải Đăng', 'dang.nguyen@gmail.com', hashedPass, 'mentor'],
-    ['Trần Quang Vinh', 'vinh.tran@gmail.com', hashedPass, 'mentor'],
-    ['Lê Tuấn Kiệt', 'kiet.le@gmail.com', hashedPass, 'mentor'],
-    ['Phạm Công Thành', 'thanh.pham@gmail.com', hashedPass, 'mentor'],
-    ['Vũ Đức Thịnh', 'thinh.vu@gmail.com', hashedPass, 'mentor'],
-    ['Hoàng Minh Tài', 'tai.hoang@gmail.com', hashedPass, 'mentor']
+    ['Nguyễn Minh Quân', 'quan.nguyen@gmail.com', hashedPass, 'mentor', '0902000001'],
+    ['Trần Đức Huy', 'huy.tran@gmail.com', hashedPass, 'mentor', '0902000002'],
+    ['Lê Hoàng Phúc', 'phuc.le@gmail.com', hashedPass, 'mentor', '0902000003'],
+    ['Phạm Gia Bảo', 'bao.pham@gmail.com', hashedPass, 'mentor', '0902000004'],
+    ['Võ Thanh Tùng', 'tung.vo@gmail.com', hashedPass, 'mentor', '0902000005'],
+    ['Đặng Quốc Khánh', 'khanh.dang@gmail.com', hashedPass, 'mentor', '0902000006'],
+    ['Bùi Anh Tuấn', 'tuan.bui@gmail.com', hashedPass, 'mentor', '0902000007'],
+    ['Phan Minh Trí', 'tri.phan@gmail.com', hashedPass, 'mentor', '0902000008'],
+    ['Ngô Thành Đạt', 'dat.ngo@gmail.com', hashedPass, 'mentor', '0902000009'],
+    ['Huỳnh Gia Hưng', 'hung.huynh@gmail.com', hashedPass, 'mentor', '0902000010'],
+    ['Đỗ Minh Khang', 'khang.do@gmail.com', hashedPass, 'mentor', '0902000011'],
+    ['Trương Nhật Nam', 'nam.truong@gmail.com', hashedPass, 'mentor', '0902000012'],
+    ['Lý Hoàng Long', 'long.ly@gmail.com', hashedPass, 'mentor', '0902000013'],
+    ['Mai Thanh Phong', 'phong.mai@gmail.com', hashedPass, 'mentor', '0902000014'],
+    ['Nguyễn Hải Đăng', 'dang.nguyen@gmail.com', hashedPass, 'mentor', '0902000015'],
+    ['Trần Quang Vinh', 'vinh.tran@gmail.com', hashedPass, 'mentor', '0902000016'],
+    ['Lê Tuấn Kiệt', 'kiet.le@gmail.com', hashedPass, 'mentor', '0902000017'],
+    ['Phạm Công Thành', 'thanh.pham@gmail.com', hashedPass, 'mentor', '0902000018'],
+    ['Vũ Đức Thịnh', 'thinh.vu@gmail.com', hashedPass, 'mentor', '0902000019'],
+    ['Hoàng Minh Tài', 'tai.hoang@gmail.com', hashedPass, 'mentor', '0902000020']
 ];
-        const [userResult] = await db.query('INSERT INTO users (full_name, email, password, role) VALUES ?', [userData]);
+        const [userResult] = await db.query('INSERT INTO users (full_name, email, password, role, phone) VALUES ?', [userData]);
         const firstMentorId = userResult.insertId + 5; // ID bắt đầu của mentor đầu tiên
 
         // 4. Nạp Mentors (Chi tiết profile)
