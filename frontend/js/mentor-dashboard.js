@@ -74,11 +74,19 @@ function renderMentorBookings(bookings) {
         }else if (b.status === 'completed') {
             actionHTML = `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider"> Đã hoàn thành</span>`;
         }
+
+        let contactHtml = `<div class="text-xs text-gray-500 mt-1">📧 ${b.student_email || 'Chưa có email'}</div>`;
+        if ((b.status === 'confirmed' || b.status === 'completed') && b.student_phone) {
+            contactHtml += `<div class="text-xs text-green-600 mt-1 font-semibold">📞 ${b.student_phone}</div>`;
+        } else if (b.status === 'confirmed' || b.status === 'completed') {
+            contactHtml += `<div class="text-xs text-gray-400 mt-1 italic">📞 Chưa cập nhật số ĐT</div>`;
+        }
+
         return `
             <tr class="hover:bg-gray-50 transition">
                 <td class="px-6 py-4">
                     <div class="font-bold text-gray-800">${b.student_name}</div>
-                    <div class="text-xs text-gray-400 mt-1">${b.student_email}</div>
+                    ${contactHtml}
                 </td>
                 <td class="px-6 py-4">
                     <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded uppercase">${b.plan_type}</span>

@@ -62,8 +62,8 @@ const getIncomingBookings = async (req, res) => {
         const mentorId = req.user.id; 
 
         const query = `
-            SELECT b.id, b.plan_type, b.status, b.created_at, b.total_price, 
-                   u.full_name as student_name, u.email as mentee_email
+            SELECT b.id, b.plan_type, b.status, b.created_at, b.total_price, b.booking_date,
+                   u.full_name as student_name, u.email as student_email, u.phone as student_phone
             FROM bookings b
             JOIN users u ON b.student_id = u.id 
             WHERE b.mentor_id = ?
@@ -184,7 +184,8 @@ const getMyBookings = async (req, res) => {
                 b.created_at, 
                 b.booking_date,
                 u.full_name as mentor_name, 
-                u.email as mentor_email
+                u.email as mentor_email,
+                u.phone as mentor_phone
             FROM bookings b
             JOIN users u ON b.mentor_id = u.id
             WHERE b.student_id = ? 
