@@ -45,7 +45,7 @@ HÃY TRẢ VỀ CHÍNH XÁC THEO ĐỊNH DẠNG JSON (Không có markdown block 
 
     } catch (error) {
         console.error("Lỗi khi gọi Gemini AI:", error);
-        throw new Error("Không thể nhờ AI phân tích lịch ngay lúc này.");
+        throw new Error("Không thể nhờ AI phân tích: " + error.message);
     }
 };
 
