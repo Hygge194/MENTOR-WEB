@@ -73,8 +73,8 @@ async function handleUpdateProfile(event) {
     submitButton.textContent = 'Đang lưu...';
 
     try {
-        const response = await fetch(`${API_URL}/profile`, {
-            method: 'PATCH',
+        const response = await fetch(`${API_URL}/mentors/profile`, {
+            method: 'PUT',
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData
         });

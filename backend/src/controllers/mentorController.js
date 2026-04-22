@@ -127,3 +127,40 @@ const getMyNotifications = async (req, res) => {
     }
 };
 module.exports = { getAllMentors, getMentorById, getMyNotifications };
+
+const updateMentorProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { full_name, scheduling_constraints, expertise, bio } = req.body;
+        
+        // Xử lý file avatar nếu có (do multer truyền vào req.file)
+        const avatar = req.file ? `/uploads/${req.file.filename}` : null;
+
+        // 1. Cập nhật thông tin chung trong bảng users
+        let userQuery = 'UPDATE users SET full_name = ?, scheduling_constraints = ?';
+        const userParams = [full_name, scheduling_constraints];
+        
+        if (avatar) {
+            userQuery += ', avatar = ?';
+            userParams.push(avatar);
+        }
+        
+        userQuery += ' WHERE id = ?';
+        userParams.push(userId);
+        
+        await db.query(userQuery, userParams);
+
+        // 2. Cập nhật thông tin chuyên môn trong bảng mentors
+        await db.query(
+            'UPDATE mentors SET expertise = ?, bio = ? WHERE user_id = ?',
+            [expertise, bio, userId]
+        );
+
+        res.status(200).json({ message: 'Cập nhật hồ sơ thành công!' });
+    } catch (error) {
+        console.error('Lỗi khi cập nhật hồ sơ Mentor:', error);
+        res.status(500).json({ message: 'Lỗi server, vui lòng thử lại sau.' });
+    }
+};
+
+module.exports = { getAllMentors, getMentorById, getMyNotifications, updateMentorProfile };
