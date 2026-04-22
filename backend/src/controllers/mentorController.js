@@ -131,14 +131,14 @@ module.exports = { getAllMentors, getMentorById, getMyNotifications };
 const updateMentorProfile = async (req, res) => {
     try {
         const userId = req.user.id;
-        const { full_name, scheduling_constraints, expertise, bio } = req.body;
+        const { full_name, expertise, bio } = req.body;
         
         // Xử lý file avatar nếu có (do multer truyền vào req.file)
         const avatar = req.file ? `/uploads/${req.file.filename}` : null;
 
         // 1. Cập nhật thông tin chung trong bảng users
-        let userQuery = 'UPDATE users SET full_name = ?, scheduling_constraints = ?';
-        const userParams = [full_name, scheduling_constraints];
+        let userQuery = 'UPDATE users SET full_name = ?';
+        const userParams = [full_name];
         
         if (avatar) {
             userQuery += ', avatar = ?';
