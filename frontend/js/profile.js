@@ -44,8 +44,12 @@ function renderProfileForm(profile) {
     document.getElementById('profile-email').value = profile.email || '';
     document.getElementById('profile-phone').value = profile.phone || '';
     document.getElementById('profile-avatar-preview').src = profile.avatar ? `${API_URL.replace('/api', '')}${profile.avatar}` : 'https://via.placeholder.com/150';
-    document.getElementById('profile-scheduling-constraints').value = profile.scheduling_constraints || '';
 
+    // [FIX] An toàn: Chỉ gán giá trị nếu tìm thấy thẻ HTML, tránh lỗi crash giao diện
+    const constraintsEl = document.getElementById('profile-scheduling-constraints');
+    if (constraintsEl) {
+        constraintsEl.value = profile.scheduling_constraints || '';
+    }
     // Các trường dành riêng cho Mentor
     const mentorFields = document.getElementById('mentor-specific-fields');
     if (profile.role === 'mentor') {
