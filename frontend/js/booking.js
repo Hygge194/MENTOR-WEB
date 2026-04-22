@@ -250,7 +250,7 @@ async function requestAiSuggest() {
         return;
     }
 
-    aiBtn.innerText = "⏳ Đang phân tích sức khỏe lịch trình...";
+    aiBtn.innerText = "⏳ Đang phân tích lịch trình...";
     aiBtn.disabled = true;
 
     try {
