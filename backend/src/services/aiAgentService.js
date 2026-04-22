@@ -33,19 +33,20 @@ HÃY TRẢ VỀ CHÍNH XÁC THEO ĐỊNH DẠNG JSON (Không có markdown block 
   ... (tổng cộng 3 object)
 ]
 `;
-
     try {
         const result = await ai.generateContent(prompt);
-        let textString = result.response.text();
-        // Chuẩn hóa JSON phòng trường hợp AI bọc markdown
+        const response = await result.response; // Đợi response hoàn tất
+        let textString = response.text(); // Lấy text từ response
+        
+        // Làm sạch chuỗi JSON phòng trường hợp AI bọc trong Markdown
         textString = textString.replace(/```json/g, "").replace(/```/g, "").trim();
-        const slots = JSON.parse(textString);
-        return slots;
-
+        
+        return JSON.parse(textString);
     } catch (error) {
-        console.error("Lỗi khi gọi Gemini AI:", error);
-        throw new Error("Không thể nhờ AI phân tích: " + error.message);
+        console.error("Lỗi Gemini:", error);
+        throw new Error("AI đang bận, vui lòng thử lại sau.");
     }
+
 };
 
 module.exports = { suggestSlots };
