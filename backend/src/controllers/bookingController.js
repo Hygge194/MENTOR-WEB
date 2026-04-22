@@ -225,7 +225,12 @@ const completeBooking = async (req, res) => {
 const aiSuggest = async (req, res) => {
     try {
         const studentId = req.user.id;
-        const { mentor_id } = req.body;
+        // Hỗ trợ cả hai trường hợp Frontend gửi lên là mentor_id hoặc mentorId
+        const mentor_id = req.body.mentor_id || req.body.mentorId;
+
+        if (!mentor_id) {
+            return res.status(400).json({ message: "Thiếu thông tin mentor_id." });
+        }
 
         const [menteeRows] = await db.query('SELECT scheduling_constraints FROM users WHERE id = ?', [studentId]);
         const [mentorRows] = await db.query('SELECT scheduling_constraints FROM users WHERE id = ?', [mentor_id]);
@@ -236,23 +241,30 @@ const aiSuggest = async (req, res) => {
         // Function helper lấy lịch rảnh Google Calendar
         const { google } = require('googleapis');
         const getFreeBusy = async (userId) => {
-            const [uRows] = await db.query('SELECT google_access_token, google_refresh_token FROM users WHERE id = ?', [userId]);
-            if (uRows.length && uRows[0].google_access_token) {
-                const oauth2Client = new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET);
-                oauth2Client.setCredentials({ access_token: uRows[0].google_access_token, refresh_token: uRows[0].google_refresh_token });
-                const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
-                
-                const timeMin = new Date().toISOString();
-                const timeMax = new Date();
-                timeMax.setDate(timeMax.getDate() + 7); // Phân tích 7 ngày tới
-                const res = await calendar.freebusy.query({
-                    requestBody: {
-                         timeMin: timeMin,
-                         timeMax: timeMax.toISOString(),
-                         items: [{ id: 'primary' }]
+            try {
+                const [uRows] = await db.query('SELECT google_access_token, google_refresh_token FROM users WHERE id = ?', [userId]);
+                if (uRows.length && uRows[0].google_access_token) {
+                    const oauth2Client = new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET);
+                    oauth2Client.setCredentials({ access_token: uRows[0].google_access_token, refresh_token: uRows[0].google_refresh_token });
+                    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+                    
+                    const timeMin = new Date().toISOString();
+                    const timeMax = new Date();
+                    timeMax.setDate(timeMax.getDate() + 7); // Phân tích 7 ngày tới
+                    const res = await calendar.freebusy.query({
+                        requestBody: {
+                             timeMin: timeMin,
+                             timeMax: timeMax.toISOString(),
+                             items: [{ id: 'primary' }]
+                        }
+                    });
+                    if (res.data.calendars && res.data.calendars['primary']) {
+                        return res.data.calendars['primary'].busy || [];
                     }
-                });
-                return res.data.calendars['primary'].busy || [];
+                }
+            } catch (err) {
+                console.error(`Lỗi khi lấy lịch rảnh Google Calendar cho user ${userId}:`, err.message);
+                // Bỏ qua lỗi token Google để Gemini vẫn có thể phân tích thời gian rảnh qua Text (Constraint)
             }
             return []; // rỗng nếu chưa link
         };
@@ -269,7 +281,7 @@ const aiSuggest = async (req, res) => {
         });
     } catch (e) {
         console.error("Lỗi AI Suggest:", e);
-        res.status(500).json({ message: "AI bị lỗi hoặc bận." });
+        res.status(500).json({ message: "AI bị lỗi hoặc bận. Chi tiết: " + e.message });
     }
 };
 
