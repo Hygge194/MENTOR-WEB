@@ -7,13 +7,16 @@ const createBooking = async (req, res) => {
         const studentId = req.user.id; 
         const { mentor_id, plan_type, booking_date } = req.body;
 
+        // [FIX] Chuyển đổi định dạng 'YYYY-MM-DDTHH:mm' của datetime-local thành chuẩn MySQL (YYYY-MM-DD HH:mm:ss)
+        const mysqlBookingDate = booking_date ? booking_date.replace('T', ' ') + ':00' : null;
+
         // 1. Kiểm tra double booking (Trùng mentor_id + ngày nếu trạng thái hợp lệ)
         const [existingBookings] = await db.query(
             `SELECT * FROM bookings 
              WHERE mentor_id = ? 
-             AND DATE(booking_date) = DATE(COALESCE(?, NOW())) 
+             AND DATE(booking_date) = DATE(?) 
              AND status IN ('pending', 'confirmed')`,
-            [mentor_id, booking_date]
+            [mentor_id, mysqlBookingDate]
         );
 
         if (existingBookings.length > 0) {
@@ -43,8 +46,8 @@ const createBooking = async (req, res) => {
         // 3. Khởi tạo booking với trạng thái pending
         const [result] = await db.query(
             `INSERT INTO bookings (student_id, mentor_id, plan_type, booking_date, total_price, status) 
-             VALUES (?, ?, ?, COALESCE(?, NOW()), ?, 'pending')`,
-            [studentId, mentor_id, plan_type, booking_date, totalPrice]
+             VALUES (?, ?, ?, ?, ?, 'pending')`,
+            [studentId, mentor_id, plan_type, mysqlBookingDate, totalPrice]
         );
 
         res.status(201).json({ 
@@ -53,7 +56,7 @@ const createBooking = async (req, res) => {
         });
     } catch (error) {
         console.error('Lỗi khi create Booking:', error);
-        res.status(500).json({ message: 'Lỗi hệ thống.' });
+        res.status(500).json({ message: 'Lỗi hệ thống chi tiết: ' + error.message });
     }
 };
 //LẤY DANH SÁCH HỌC VIÊN ĐĂNG KÝ (Dành cho Mentor)
