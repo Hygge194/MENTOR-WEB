@@ -2,7 +2,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 // Cấu hình Google Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const ai = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+const ai = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 /**
  * Xử lý hàm Suggestion Slots của AI Agent
